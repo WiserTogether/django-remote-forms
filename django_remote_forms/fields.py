@@ -1,3 +1,30 @@
+from django_remote_forms.widgets import (
+    RemoteWidget,
+    RemoteInput,
+    RemoteTextInput,
+    RemotePasswordInput,
+    RemoteHiddenInput,
+    RemoteMultipleHiddenInput,
+    RemoteFileInput,
+    RemoteClearableFileInput,
+    RemoteTextarea,
+    RemoteDateInput,
+    RemoteDateTimeInput,
+    RemoteTimeInput,
+    RemoteCheckboxInput,
+    RemoteSelect,
+    RemoteNullBooleanSelect,
+    RemoteSelectMultiple,
+    RemoteRadioInput,
+    RemoteRadioFieldRenderer,
+    RemoteRadioSelect,
+    RemoteCheckboxSelectMultiple,
+    RemoteMultiWidget,
+    RemoteSplitDateTimeWidget,
+    RemoteSplitHiddenDateTimeWidget
+)
+
+
 class RemoteField(object):
     """
     A base object for being able to return a Django Form Field as a Python
@@ -15,14 +42,26 @@ class RemoteField(object):
         self.form_initial_data = form_initial_data
 
     def as_dict(self):
-        return {
-            'required': self.field.required,
-            'widget': None,  # TODO:  Get widget as_dict() working.
-            'label': self.field.label,
-            'initial': self.form_initial_data or self.field.initial,
-            'help_text': self.field.help_text,
-            'error_messages': self.field.error_messages,
-        }
+        field_dict = {}
+        field_dict['required'] = self.field.required
+        field_dict['label'] = self.field.label
+        field_dict['initial'] = self.form_initial_data or self.field.initial
+        field_dict['help_text'] = self.field.help_text
+        field_dict['error_messages'] = self.field.error_messages
+
+        # Instantiate the Remote Forms equivalent of the widget if possible
+        # in order to retrieve the widget contents as a dictionary.
+        try:
+            remote_widget_class = 'Remote%s' % self.field.widget.__class__.__name__
+            remote_widget = remote_widget_class(self.field.widget)
+        except Exception:
+            widget_dict = {}
+        else:
+            widget_dict = remote_widget.as_dict()
+
+        field_dict['widget'] = widget_dict
+
+        return field_dict
 
 
 class RemoteCharField(RemoteField):
