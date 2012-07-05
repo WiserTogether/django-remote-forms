@@ -14,7 +14,7 @@ setup(
     author='WiserTogether Tech Team',
     author_email='tech@wisertogether.com',
     url='http://github.com/wisertoghether/django-remote-forms/',
-    long_description=open('README.rst', 'r').read(),
+    long_description=open('README', 'r').read(),
     packages=[
         'django_remote_forms',
     ],
