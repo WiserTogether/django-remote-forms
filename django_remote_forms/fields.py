@@ -1,28 +1,5 @@
-from django_remote_forms.widgets import (
-    RemoteWidget,
-    RemoteInput,
-    RemoteTextInput,
-    RemotePasswordInput,
-    RemoteHiddenInput,
-    RemoteMultipleHiddenInput,
-    RemoteFileInput,
-    RemoteClearableFileInput,
-    RemoteTextarea,
-    RemoteDateInput,
-    RemoteDateTimeInput,
-    RemoteTimeInput,
-    RemoteCheckboxInput,
-    RemoteSelect,
-    RemoteNullBooleanSelect,
-    RemoteSelectMultiple,
-    RemoteRadioInput,
-    RemoteRadioFieldRenderer,
-    RemoteRadioSelect,
-    RemoteCheckboxSelectMultiple,
-    RemoteMultiWidget,
-    RemoteSplitDateTimeWidget,
-    RemoteSplitHiddenDateTimeWidget
-)
+from django_remote_forms import logger
+from django_remote_forms import widgets
 
 
 class RemoteField(object):
@@ -52,9 +29,11 @@ class RemoteField(object):
         # Instantiate the Remote Forms equivalent of the widget if possible
         # in order to retrieve the widget contents as a dictionary.
         try:
-            remote_widget_class = 'Remote%s' % self.field.widget.__class__.__name__
+            remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
+            remote_widget_class = getattr(widgets, remote_widget_class_name)
             remote_widget = remote_widget_class(self.field.widget)
-        except Exception:
+        except Exception, e:
+            logger.warning('Error serializing %s: %s', remote_widget_class, str(e))
             widget_dict = {}
         else:
             widget_dict = remote_widget.as_dict()

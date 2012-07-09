@@ -1,29 +1,6 @@
-from django_remote_forms.fields import (
-    RemoteField,
-    RemoteCharField,
-    RemoteIntegerField,
-    RemoteFloatField,
-    RemoteDecimalField,
-    RemoteDateField,
-    RemoteDateTimeField,
-    RemoteRegexField,
-    RemoteEmailField,
-    RemoteFileField,
-    RemoteImageField,
-    RemoteURLField,
-    RemoteBooleanField,
-    RemoteNullBooleanField,
-    RemoteChoiceField,
-    RemoteTypedChoiceField,
-    RemoteMultipleChoiceField,
-    RemoteTypedMultipleChoiceField,
-    RemoteComboField,
-    RemoteMultiValueField,
-    RemoteFilePathField,
-    RemoteSplitDateTimeField,
-    RemoteIPAddressField,
-    RemoteSlugField
-)
+from django_remote_forms import logger
+
+from django_remote_forms import fields
 
 
 class RemoteForm(object):
@@ -78,9 +55,11 @@ class RemoteForm(object):
             # Instantiate the Remote Forms equivalent of the field if possible
             # in order to retrieve the field contents as a dictionary.
             try:
-                remote_field_class = 'Remote%s' % field.__class__.__name__
+                remote_field_class_name = 'Remote%s' % field.__class__.__name__
+                remote_field_class = getattr(fields, remote_field_class_name)
                 remote_field = remote_field_class(field, form_initial_data)
-            except Exception:
+            except Exception, e:
+                logger.warning('Error serializing field %s: %s', remote_field_class_name, str(e))
                 field_dict = {}
             else:
                 field_dict = remote_field.as_dict()
