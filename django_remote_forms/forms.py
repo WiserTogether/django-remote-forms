@@ -60,9 +60,9 @@ class RemoteForm(object):
 
         form_dict = {}
         form_dict['non_field_errors'] = self.form.non_field_errors()
-        form_dict['label_suffix'] = self.form.get('label_suffix', None)
-        form_dict['is_bound'] = self.form.get('is_bound', False)
-        form_dict['prefix'] = self.form.get('prefix', None)
+        form_dict['label_suffix'] = self.form.label_suffix
+        form_dict['is_bound'] = self.form.is_bound
+        form_dict['prefix'] = self.form.prefix
         form_dict['fields'] = {}
 
         for name, field in self.form.fields.items():
@@ -73,7 +73,7 @@ class RemoteForm(object):
             # Please refer to the Django Form API documentation for details on
             # why this is necessary:
             # https://docs.djangoproject.com/en/dev/ref/forms/api/#dynamic-initial-values
-            form_initial_data = self.form.initial.get(name, None)
+            form_initial_data = getattr(self.form.initial, name, None)
 
             # Instantiate the Remote Forms equivalent of the field if possible
             # in order to retrieve the field contents as a dictionary.
