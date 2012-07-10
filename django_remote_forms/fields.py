@@ -1,5 +1,6 @@
-from django_remote_forms import logger
-from django_remote_forms import widgets
+from django_remote_forms import logger, widgets
+
+from django_remote_forms.utils import normalize_errors
 
 
 class RemoteField(object):
@@ -24,7 +25,8 @@ class RemoteField(object):
         field_dict['label'] = self.field.label
         field_dict['initial'] = self.form_initial_data or self.field.initial
         field_dict['help_text'] = self.field.help_text
-        field_dict['error_messages'] = self.field.error_messages
+
+        field_dict['error_messages'] = normalize_errors(self.field.error_messages)
 
         # Instantiate the Remote Forms equivalent of the widget if possible
         # in order to retrieve the widget contents as a dictionary.

@@ -1,6 +1,6 @@
-from django_remote_forms import logger
+from django_remote_forms import fields, logger
 
-from django_remote_forms import fields
+from django_remote_forms.utils import normalize_errors
 
 
 class RemoteForm(object):
@@ -34,9 +34,8 @@ class RemoteForm(object):
             }
         }
         """
-
         form_dict = {}
-        form_dict['non_field_errors'] = self.form.non_field_errors()
+        form_dict['non_field_errors'] = normalize_errors(self.form.non_field_errors())
         form_dict['label_suffix'] = self.form.label_suffix
         form_dict['is_bound'] = self.form.is_bound
         form_dict['prefix'] = self.form.prefix
