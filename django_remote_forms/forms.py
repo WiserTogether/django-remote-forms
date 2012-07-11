@@ -1,5 +1,6 @@
-from django_remote_forms import fields, logger
+from django.utils.datastructures import SortedDict
 
+from django_remote_forms import fields, logger
 from django_remote_forms.utils import normalize_errors
 
 
@@ -34,14 +35,20 @@ class RemoteForm(object):
             }
         }
         """
-        form_dict = {}
+        form_dict = SortedDict()
+        form_dict['title'] = self.form.__class__.__name__
         form_dict['non_field_errors'] = normalize_errors(self.form.non_field_errors())
         form_dict['label_suffix'] = self.form.label_suffix
         form_dict['is_bound'] = self.form.is_bound
         form_dict['prefix'] = self.form.prefix
-        form_dict['fields'] = {}
+        form_dict['fields'] = SortedDict()
 
-        for name, field in self.form.fields.items():
+        if self.form.fields.keyOrder:
+            field_order = self.form.fields.keyOrder
+        else:
+            field_order = self.form.fields.keys()
+
+        for name, field in [(x, self.form.fields[x]) for x in field_order]:
             # Retrieve the initial data from the form itself if it exists so
             # that we properly handle which initial data should be returned in
             # the dictionary.

@@ -1,9 +1,13 @@
+from django.utils.datastructures import SortedDict
+
+
 class RemoteWidget(object):
     def __init__(self, widget):
         self.widget = widget
 
     def as_dict(self):
-        widget_dict = {}
+        widget_dict = SortedDict()
+        widget_dict['title'] = self.widget.__class__.__name__
         widget_dict['is_hidden'] = self.widget.is_hidden
         widget_dict['needs_multipart_form'] = self.widget.needs_multipart_form
         widget_dict['is_localized'] = self.widget.is_localized
@@ -17,7 +21,7 @@ class RemoteInput(RemoteWidget):
     def as_dict(self):
         widget_dict = super(RemoteInput, self).as_dict()
 
-        widget_dict.update(input_type=self.widget.input_type)
+        widget_dict['input_type'] = self.widget.input_type
 
         return widget_dict
 
@@ -41,7 +45,7 @@ class RemoteMultipleHiddenInput(RemoteHiddenInput):
     def as_dict(self):
         widget_dict = super(RemoteMultipleHiddenInput, self).as_dict()
 
-        widget_dict.update(choices=self.widget.choices)
+        widget_dict['choices'] = self.widget.choices
 
         return widget_dict
 
@@ -55,11 +59,9 @@ class RemoteClearableFileInput(RemoteFileInput):
     def as_dict(self):
         widget_dict = super(RemoteClearableFileInput, self).as_dict()
 
-        widget_dict.update(
-            initial_text=self.widget.initial_text,
-            input_text=self.widget.input_text,
-            clear_checkbox_label=self.widget.clear_checkbox_label
-        )
+        widget_dict['initial_text'] = self.widget.initial_text
+        widget_dict['input_text'] = self.widget.input_text
+        widget_dict['clear_checkbox_label'] = self.widget.clear_checkbox_label
 
         return widget_dict
 
@@ -73,10 +75,8 @@ class RemoteDateInput(RemoteInput):
     def as_dict(self):
         widget_dict = super(RemoteDateInput, self).as_dict()
 
-        widget_dict.update(
-            format=self.widget.format,
-            manual_format=self.widget.manual_format
-        )
+        widget_dict['format'] = self.widget.format
+        widget_dict['manual_format'] = self.widget.manual_format
 
         return widget_dict
 
@@ -95,7 +95,12 @@ class RemoteCheckboxInput(RemoteWidget):
     def as_dict(self):
         widget_dict = super(RemoteCheckboxInput, self).as_dict()
 
-        widget_dict.update(check_test=self.widget.check_test)
+        # If check test is None then the input should accept null values
+        check_test = None
+        if self.widget.check_test is not None:
+            check_test = True
+
+        widget_dict['check_test'] = check_test
 
         return widget_dict
 
@@ -121,7 +126,8 @@ class RemoteSelectMultiple(RemoteSelect):
 
 class RemoteRadioInput(RemoteWidget):
     def as_dict(self):
-        widget_dict = {}
+        widget_dict = SortedDict()
+        widget_dict['title'] = self.widget.__class__.__name__
         widget_dict['name'] = self.widget.name
         widget_dict['value'] = self.widget.value
         widget_dict['attrs'] = self.widget.attrs
@@ -134,7 +140,8 @@ class RemoteRadioInput(RemoteWidget):
 
 class RemoteRadioFieldRenderer(RemoteWidget):
     def as_dict(self):
-        widget_dict = {}
+        widget_dict = SortedDict()
+        widget_dict['title'] = self.widget.__class__.__name__
         widget_dict['name'] = self.widget.name
         widget_dict['value'] = self.widget.value
         widget_dict['attrs'] = self.widget.attrs
@@ -157,7 +164,12 @@ class RemoteMultiWidget(RemoteWidget):
     def as_dict(self):
         widget_dict = super(RemoteMultiWidget, self).as_dict()
 
-        widget_dict.update(widgets=self.widget.widgets)
+        widget_list = []
+        for widget in self.widget.widgets:
+            # Fetch remote widget and convert to dict
+            widget_list.append()
+
+        widget_dict['widgets'] = widget_list
 
         return widget_dict
 
@@ -166,10 +178,8 @@ class RemoteSplitDateTimeWidget(RemoteMultiWidget):
     def as_dict(self):
         widget_dict = super(RemoteSplitDateTimeWidget, self).as_dict()
 
-        widget_dict.update(
-            date_format=self.widget.date_format,
-            time_format=self.widget.time_format
-        )
+        widget_dict['date_format'] = self.widget.date_format
+        widget_dict['time_format'] = self.widget.time_format
 
         return widget_dict
 
