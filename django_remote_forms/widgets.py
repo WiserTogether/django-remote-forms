@@ -109,7 +109,12 @@ class RemoteSelect(RemoteWidget):
     def as_dict(self):
         widget_dict = super(RemoteSelect, self).as_dict()
 
-        widget_dict.update(choices=self.widget.choices)
+        widget_dict['choices'] = []
+        for key, value in self.widget.choices:
+            widget_dict['choices'].append({
+                'value': key,
+                'display': value
+            })
 
         return widget_dict
 
