@@ -5,7 +5,8 @@ from django.utils.datastructures import SortedDict
 
 
 class RemoteWidget(object):
-    def __init__(self, widget):
+    def __init__(self, widget, field_name=None):
+        self.field_name = field_name
         self.widget = widget
 
     def as_dict(self):
@@ -181,6 +182,15 @@ class RemoteRadioFieldRenderer(RemoteWidget):
 class RemoteRadioSelect(RemoteSelect):
     def as_dict(self):
         widget_dict = super(RemoteRadioSelect, self).as_dict()
+
+        widget_dict['choices'] = []
+        for key, value in self.widget.choices:
+            widget_dict['choices'].append({
+                'name': self.field_name or '',
+                'value': key,
+                'display': value
+            })
+
         return widget_dict
 
 

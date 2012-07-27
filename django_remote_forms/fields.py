@@ -16,7 +16,8 @@ class RemoteField(object):
     https://docs.djangoproject.com/en/dev/ref/forms/api/#dynamic-initial-values
     """
 
-    def __init__(self, field, form_initial_data=None):
+    def __init__(self, field, form_initial_data=None, field_name=None):
+        self.field_name = field_name
         self.field = field
         self.form_initial_data = form_initial_data
 
@@ -35,7 +36,7 @@ class RemoteField(object):
         try:
             remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
             remote_widget_class = getattr(widgets, remote_widget_class_name)
-            remote_widget = remote_widget_class(self.field.widget)
+            remote_widget = remote_widget_class(self.field.widget, field_name=self.field_name)
         except Exception, e:
             logger.warning('Error serializing %s: %s', remote_widget_class, str(e))
             widget_dict = {}

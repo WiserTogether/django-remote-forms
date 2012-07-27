@@ -63,7 +63,7 @@ class RemoteForm(object):
             try:
                 remote_field_class_name = 'Remote%s' % field.__class__.__name__
                 remote_field_class = getattr(fields, remote_field_class_name)
-                remote_field = remote_field_class(field, form_initial_data)
+                remote_field = remote_field_class(field, form_initial_data, field_name=name)
             except Exception, e:
                 logger.warning('Error serializing field %s: %s', remote_field_class_name, str(e))
                 field_dict = {}
