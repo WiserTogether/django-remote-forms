@@ -1,3 +1,6 @@
+import datetime
+
+from django.utils.dates import MONTHS
 from django.utils.datastructures import SortedDict
 
 
@@ -68,7 +71,9 @@ class RemoteClearableFileInput(RemoteFileInput):
 
 class RemoteTextarea(RemoteWidget):
     def as_dict(self):
-        return super(RemoteTextarea, self).as_dict()
+        widget_dict = super(RemoteTextarea, self).as_dict()
+        widget_dict['input_type'] = 'textarea'
+        return widget_dict
 
 
 class RemoteDateInput(RemoteInput):
@@ -77,6 +82,19 @@ class RemoteDateInput(RemoteInput):
 
         widget_dict['format'] = self.widget.format
         widget_dict['manual_format'] = self.widget.manual_format
+        widget_dict['date'] = self.widget.manual_format
+
+        current_year = datetime.datetime.now().year
+        widget_dict['choices'] = [{
+            'title': 'day',
+            'data': [{'key': x, 'value': x} for x in range(1, 32)]
+        }, {
+            'title': 'month',
+            'data': [{'key': x, 'value': unicode(y)} for (x, y) in MONTHS.items()]
+        }, {
+            'title': 'year',
+            'data': [{'key': x, 'value': x} for x in range(current_year - 100, current_year + 1)]
+        }]
 
         return widget_dict
 
@@ -101,6 +119,7 @@ class RemoteCheckboxInput(RemoteWidget):
             check_test = True
 
         widget_dict['check_test'] = check_test
+        widget_dict['input_type'] = 'checkbox'
 
         return widget_dict
 
@@ -115,6 +134,8 @@ class RemoteSelect(RemoteWidget):
                 'value': key,
                 'display': value
             })
+
+        widget_dict['input_type'] = 'select'
 
         return widget_dict
 
@@ -139,6 +160,7 @@ class RemoteRadioInput(RemoteWidget):
         widget_dict['choice_value'] = self.widget.choice_value
         widget_dict['choice_label'] = self.widget.choice_label
         widget_dict['index'] = self.widget.index
+        widget_dict['input_type'] = 'radio'
 
         return widget_dict
 
@@ -151,13 +173,15 @@ class RemoteRadioFieldRenderer(RemoteWidget):
         widget_dict['value'] = self.widget.value
         widget_dict['attrs'] = self.widget.attrs
         widget_dict['choices'] = self.widget.choices
+        widget_dict['input_type'] = 'radio'
 
         return widget_dict
 
 
 class RemoteRadioSelect(RemoteSelect):
     def as_dict(self):
-        return super(RemoteRadioSelect, self).as_dict()
+        widget_dict = super(RemoteRadioSelect, self).as_dict()
+        return widget_dict
 
 
 class RemoteCheckboxSelectMultiple(RemoteSelectMultiple):
