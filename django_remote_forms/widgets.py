@@ -84,6 +84,7 @@ class RemoteDateInput(RemoteInput):
         widget_dict['format'] = self.widget.format
         widget_dict['manual_format'] = self.widget.manual_format
         widget_dict['date'] = self.widget.manual_format
+        widget_dict['input_type'] = 'date'
 
         current_year = datetime.datetime.now().year
         widget_dict['choices'] = [{
@@ -190,6 +191,8 @@ class RemoteRadioSelect(RemoteSelect):
                 'value': key,
                 'display': value
             })
+
+        widget_dict['input_type'] = 'radio'
 
         return widget_dict
 
