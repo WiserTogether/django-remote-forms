@@ -27,7 +27,7 @@ class RemoteField(object):
         field_dict['required'] = self.field.required
         field_dict['label'] = unicode(self.field.label)
         field_dict['initial'] = self.form_initial_data or self.field.initial
-        field_dict['help_text'] = self.field.help_text
+        field_dict['help_text'] = unicode(self.field.help_text)
 
         field_dict['error_messages'] = normalize_errors(self.field.error_messages)
 
@@ -93,7 +93,7 @@ class RemoteDateField(RemoteField):
     def as_dict(self):
         field_dict = super(RemoteDateField, self).as_dict()
 
-        field_dict['input_formats'] = self.field.input_formats
+        field_dict['input_formats'] = [unicode(x) for x in self.field.input_formats]
 
         return field_dict
 
@@ -102,7 +102,7 @@ class RemoteTimeField(RemoteField):
     def as_dict(self):
         field_dict = super(RemoteTimeField, self).as_dict()
 
-        field_dict['input_formats'] = self.field.input_formats
+        field_dict['input_formats'] = [unicode(x) for x in self.field.input_formats]
 
         return field_dict
 
@@ -111,7 +111,7 @@ class RemoteDateTimeField(RemoteField):
     def as_dict(self):
         field_dict = super(RemoteDateTimeField, self).as_dict()
 
-        field_dict['input_formats'] = self.field.input_formats
+        field_dict['input_formats'] = [unicode(x) for x in self.field.input_formats]
 
         return field_dict
 
