@@ -77,13 +77,22 @@ class RemoteTextarea(RemoteWidget):
         return widget_dict
 
 
-class RemoteDateInput(RemoteInput):
+class RemoteTimeInput(RemoteInput):
     def as_dict(self):
-        widget_dict = super(RemoteDateInput, self).as_dict()
+        widget_dict = super(RemoteTimeInput, self).as_dict()
 
         widget_dict['format'] = self.widget.format
         widget_dict['manual_format'] = self.widget.manual_format
         widget_dict['date'] = self.widget.manual_format
+        widget_dict['input_type'] = 'time'
+
+        return widget_dict
+
+
+class RemoteDateInput(RemoteTimeInput):
+    def as_dict(self):
+        widget_dict = super(RemoteDateInput, self).as_dict()
+
         widget_dict['input_type'] = 'date'
 
         current_year = datetime.datetime.now().year
@@ -101,14 +110,13 @@ class RemoteDateInput(RemoteInput):
         return widget_dict
 
 
-class RemoteDateTimeInput(RemoteDateInput):
+class RemoteDateTimeInput(RemoteTimeInput):
     def as_dict(self):
-        return super(RemoteDateTimeInput, self).as_dict()
+        widget_dict = super(RemoteDateTimeInput, self).as_dict()
 
+        widget_dict['input_type'] = 'datetime'
 
-class RemoteTimeInput(RemoteDateInput):
-    def as_dict(self):
-        return super(RemoteTimeInput, self).as_dict()
+        return widget_dict
 
 
 class RemoteCheckboxInput(RemoteWidget):
@@ -149,7 +157,12 @@ class RemoteNullBooleanSelect(RemoteSelect):
 
 class RemoteSelectMultiple(RemoteSelect):
     def as_dict(self):
-        return super(RemoteSelectMultiple, self).as_dict()
+        widget_dict = super(RemoteSelectMultiple, self).as_dict()
+
+        widget_dict['input_type'] = 'selectmultiple'
+        widget_dict['size'] = len(widget_dict['choices'])
+
+        return widget_dict
 
 
 class RemoteRadioInput(RemoteWidget):

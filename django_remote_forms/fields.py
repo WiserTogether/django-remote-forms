@@ -33,12 +33,12 @@ class RemoteField(object):
 
         # Instantiate the Remote Forms equivalent of the widget if possible
         # in order to retrieve the widget contents as a dictionary.
+        remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
         try:
-            remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
             remote_widget_class = getattr(widgets, remote_widget_class_name)
             remote_widget = remote_widget_class(self.field.widget, field_name=self.field_name)
         except Exception, e:
-            logger.warning('Error serializing %s: %s', remote_widget_class, str(e))
+            logger.warning('Error serializing %s: %s', remote_widget_class_name, str(e))
             widget_dict = {}
         else:
             widget_dict = remote_widget.as_dict()
@@ -188,6 +188,11 @@ class RemoteTypedChoiceField(RemoteChoiceField):
 class RemoteMultipleChoiceField(RemoteChoiceField):
     def as_dict(self):
         return super(RemoteMultipleChoiceField, self).as_dict()
+
+
+class RemoteModelMultipleChoiceField(RemoteMultipleChoiceField):
+    def as_dict(self):
+        return super(RemoteModelMultipleChoiceField, self).as_dict()
 
 
 class RemoteTypedMultipleChoiceField(RemoteMultipleChoiceField):
