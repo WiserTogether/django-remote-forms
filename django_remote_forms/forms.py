@@ -42,6 +42,7 @@ class RemoteForm(object):
         form_dict['is_bound'] = self.form.is_bound
         form_dict['prefix'] = self.form.prefix
         form_dict['fields'] = SortedDict()
+        form_dict['errors'] = normalize_errors(self.form.errors)
 
         if self.form.fields.keyOrder:
             field_order = self.form.fields.keyOrder

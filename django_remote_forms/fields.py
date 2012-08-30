@@ -1,3 +1,5 @@
+import datetime
+
 from django.utils.datastructures import SortedDict
 
 from django_remote_forms import logger, widgets
@@ -89,31 +91,30 @@ class RemoteDecimalField(RemoteIntegerField):
         return field_dict
 
 
-class RemoteDateField(RemoteField):
-    def as_dict(self):
-        field_dict = super(RemoteDateField, self).as_dict()
-
-        field_dict['input_formats'] = [unicode(x) for x in self.field.input_formats]
-
-        return field_dict
-
-
 class RemoteTimeField(RemoteField):
     def as_dict(self):
         field_dict = super(RemoteTimeField, self).as_dict()
 
         field_dict['input_formats'] = [unicode(x) for x in self.field.input_formats]
 
+        if (field_dict['initial']):
+            if callable(field_dict['initial']):
+                field_dict['initial'] = field_dict['initial']()
+
+            if (isinstance(field_dict['initial'], (datetime.datetime, datetime.time, datetime.date))):
+                field_dict['initial'] = field_dict['initial'].strftime(field_dict['input_formats'][0])
+
         return field_dict
 
 
-class RemoteDateTimeField(RemoteField):
+class RemoteDateField(RemoteTimeField):
     def as_dict(self):
-        field_dict = super(RemoteDateTimeField, self).as_dict()
+        return super(RemoteDateField, self).as_dict()
 
-        field_dict['input_formats'] = [unicode(x) for x in self.field.input_formats]
 
-        return field_dict
+class RemoteDateTimeField(RemoteTimeField):
+    def as_dict(self):
+        return super(RemoteDateTimeField, self).as_dict()
 
 
 class RemoteRegexField(RemoteCharField):
