@@ -1,7 +1,7 @@
 from django.utils.datastructures import SortedDict
 
 from django_remote_forms import fields, logger
-from django_remote_forms.utils import normalize_errors
+from django_remote_forms.utils import resolve_promise
 
 
 class RemoteForm(object):
@@ -37,12 +37,12 @@ class RemoteForm(object):
         """
         form_dict = SortedDict()
         form_dict['title'] = self.form.__class__.__name__
-        form_dict['non_field_errors'] = normalize_errors(self.form.non_field_errors())
+        form_dict['non_field_errors'] = self.form.non_field_errors()
         form_dict['label_suffix'] = self.form.label_suffix
         form_dict['is_bound'] = self.form.is_bound
         form_dict['prefix'] = self.form.prefix
         form_dict['fields'] = SortedDict()
-        form_dict['errors'] = normalize_errors(self.form.errors)
+        form_dict['errors'] = self.form.errors
 
         if self.form.fields.keyOrder:
             field_order = self.form.fields.keyOrder
@@ -73,4 +73,4 @@ class RemoteForm(object):
 
             form_dict['fields'][name] = field_dict
 
-        return form_dict
+        return resolve_promise(form_dict)

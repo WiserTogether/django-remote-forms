@@ -1,9 +1,9 @@
 import datetime
 
+from django.conf import settings
 from django.utils.datastructures import SortedDict
 
 from django_remote_forms import logger, widgets
-from django_remote_forms.utils import normalize_errors
 
 
 class RemoteField(object):
@@ -27,11 +27,11 @@ class RemoteField(object):
         field_dict = SortedDict()
         field_dict['title'] = self.field.__class__.__name__
         field_dict['required'] = self.field.required
-        field_dict['label'] = unicode(self.field.label)
+        field_dict['label'] = self.field.label
         field_dict['initial'] = self.form_initial_data or self.field.initial
-        field_dict['help_text'] = unicode(self.field.help_text)
+        field_dict['help_text'] = self.field.help_text
 
-        field_dict['error_messages'] = normalize_errors(self.field.error_messages)
+        field_dict['error_messages'] = self.field.error_messages
 
         # Instantiate the Remote Forms equivalent of the widget if possible
         # in order to retrieve the widget contents as a dictionary.
@@ -95,14 +95,24 @@ class RemoteTimeField(RemoteField):
     def as_dict(self):
         field_dict = super(RemoteTimeField, self).as_dict()
 
-        field_dict['input_formats'] = [unicode(x) for x in self.field.input_formats]
+        field_dict['input_formats'] = self.field.input_formats
 
         if (field_dict['initial']):
             if callable(field_dict['initial']):
                 field_dict['initial'] = field_dict['initial']()
 
+            # If initial value is datetime then convert it using first available input format
             if (isinstance(field_dict['initial'], (datetime.datetime, datetime.time, datetime.date))):
-                field_dict['initial'] = field_dict['initial'].strftime(field_dict['input_formats'][0])
+                if not len(field_dict['input_formats']):
+                    if isinstance(field_dict['initial'], datetime.date):
+                        field_dict['input_formats'] = settings.DATE_INPUT_FORMATS
+                    elif isinstance(field_dict['initial'], datetime.time):
+                        field_dict['input_formats'] = settings.TIME_INPUT_FORMATS
+                    elif isinstance(field_dict['initial'], datetime.datetime):
+                        field_dict['input_formats'] = settings.DATETIME_INPUT_FORMATS
+
+                input_format = field_dict['input_formats'][0]
+                field_dict['initial'] = field_dict['initial'].strftime(input_format)
 
         return field_dict
 
