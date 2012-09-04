@@ -138,6 +138,9 @@ class RemoteForm(object):
             form_dict['fields'][name] = field_dict
 
             # Load the initial data, which is a conglomerate of form initial and field initial
+            if 'initial' not in form_dict['fields'][name]:
+                form_dict['fields'][name]['initial'] = None
+
             initial_data[name] = form_dict['fields'][name]['initial']
 
         if self.form.data:

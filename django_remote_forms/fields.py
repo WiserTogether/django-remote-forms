@@ -184,6 +184,11 @@ class RemoteChoiceField(RemoteField):
         return field_dict
 
 
+class RemoteModelChoiceField(RemoteChoiceField):
+    def as_dict(self):
+        return super(RemoteModelChoiceField, self).as_dict()
+
+
 class RemoteTypedChoiceField(RemoteChoiceField):
     def as_dict(self):
         field_dict = super(RemoteTypedChoiceField, self).as_dict()
