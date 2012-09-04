@@ -108,6 +108,8 @@ class RemoteForm(object):
         form_dict['fields'] = SortedDict()
         form_dict['errors'] = self.form.errors
 
+        initial_data = {}
+
         for name, field in [(x, self.form.fields[x]) for x in self.fields]:
             # Retrieve the initial data from the form itself if it exists so
             # that we properly handle which initial data should be returned in
@@ -134,5 +136,13 @@ class RemoteForm(object):
                 field_dict['readonly'] = True
 
             form_dict['fields'][name] = field_dict
+
+            # Load the initial data, which is a conglomerate of form initial and field initial
+            initial_data[name] = form_dict['fields'][name]['initial']
+
+        if self.form.data:
+            form_dict['data'] = self.form.data
+        else:
+            form_dict['data'] = initial_data
 
         return resolve_promise(form_dict)
