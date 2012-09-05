@@ -131,7 +131,8 @@ class RemoteRegexField(RemoteCharField):
     def as_dict(self):
         field_dict = super(RemoteRegexField, self).as_dict()
 
-        field_dict['regex'] = self.field.regex
+        # We don't need the pattern object in the frontend
+        # field_dict['regex'] = self.field.regex
 
         return field_dict
 
@@ -236,7 +237,7 @@ class RemoteMultiValueField(RemoteField):
     def as_dict(self):
         field_dict = super(RemoteMultiValueField, self).as_dict()
 
-        field_dict.update(fields=self.field.fields)
+        field_dict['fields'] = self.field.fields
 
         return field_dict
 
