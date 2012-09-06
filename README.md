@@ -15,7 +15,7 @@ remote_form = RemoteForm(form)
 remote_form_dict = remote_form.as_dict()
 ```
 
-## djangocon US 2012
+## Resources from djangocon US 2012
 
 ### Presentation
 
@@ -23,16 +23,43 @@ Please go through my [djangocon US 2012 talk](http://www.slideshare.net/tarequeh
 to understand the problem sphere, motivations, sample remote form output and example implementation
 of Remote Forms
 
-## djangocon US 2012 Talk Proposal
+### Original Proposal
 
-In our quest to modularize the architecture of web applications, we create self-containing backend systems that provide web APIs for programmatic interactions. This gives us the flexibility to separate different system components. A system with multiple backend components e.g. user profile engine, content engine, community engine, analytics engine may have a single frontend application that fetches data from all of these components using respective web APIs.
+This is a bit lengthy. But if you want to know more about my motivations behind developing django-remote-forms
+then read on.
 
-With the increased availability of powerful JavaScript frameworks, such frontend applications are often purely JS based to decrease application footprint, increase deployment flexibility and separate presentation from data. The separation is very rewarding from a software engineering standpoint but imposes several limitations on system design. Using django to construct the API for arbitrary consumers comes with the limitation of not being able to utilize the powerful django form subsystem to drive forms on these consumers. But is there a way to overcome this restriction?
+In our quest to modularize the architecture of web applications, we create self-containing backend
+systems that provide web APIs for programmatic interactions. This gives us the flexibility to
+separate different system components. A system with multiple backend components e.g. user profile
+engine, content engine, community engine, analytics engine may have a single frontend application
+that fetches data from all of these components using respective web APIs.
 
-This is not a trivial problem to solve and there are only a few assumptions we can make about the web API consumer. It can be a native mobile or desktop - application or browser. We advocate that web APIs should provide sufficient information about 'forms' so that they can be faithfully reproduced at the consumer end.
+With the increased availability of powerful JavaScript frameworks, such frontend applications are
+often purely JS based to decrease application footprint, increase deployment flexibility and
+separate presentation from data. The separation is very rewarding from a software engineering
+standpoint but imposes several limitations on system design. Using django to construct the API for
+arbitrary consumers comes with the limitation of not being able to utilize the powerful django form
+subsystem to drive forms on these consumers. But is there a way to overcome this restriction?
 
-Even in a API backend built using django, forms are essential for accepting, filtering, processing and saving data. The django form subsystem provides many useful features to accomplish these tasks. At the same time it facilitates the process of rendering the form elements in a browser environment. The concepts of form fields combined with widgets can go a long way in streamlining the interface to interact with data.
+This is not a trivial problem to solve and there are only a few assumptions we can make about the
+web API consumer. It can be a native mobile or desktop - application or browser. We advocate that
+web APIs should provide sufficient information about 'forms' so that they can be faithfully
+reproduced at the consumer end.
 
-We propose an architecture to serialize information about django forms (to JSON) in a framework independent fashion so that it can be consumed by any frontend application that renders HTML. Such information includes but is not limited to basic form configurations, security tokens (if necessary), rendering metadata and error handling instructions. We lovingly name this architecture - django-remote-forms.
+Even in a API backend built using django, forms are essential for accepting, filtering, processing
+and saving data. The django form subsystem provides many useful features to accomplish these tasks.
+At the same time it facilitates the process of rendering the form elements in a browser environment.
+The concepts of form fields combined with widgets can go a long way in streamlining the interface
+to interact with data.
 
-At WiserTogether, we are in the process of building a component based architecture that strictly provides data endpoints for frontend applications to consume. We are working towards developing our frontend application for web browsers using backbone.js as MVC and handlebars as the templating engine. django-remote-forms helps us streamline our data input interface with the django forms living at the API backend.
+We propose an architecture to serialize information about django forms (to JSON) in a framework
+independent fashion so that it can be consumed by any frontend application that renders HTML. Such
+information includes but is not limited to basic form configurations, security tokens (if
+necessary), rendering metadata and error handling instructions. We lovingly name this architecture
+- django-remote-forms.
+
+At WiserTogether, we are in the process of building a component based architecture that strictly
+provides data endpoints for frontend applications to consume. We are working towards developing
+our frontend application for web browsers using backbone.js as MVC and handlebars as the templating
+engine. django-remote-forms helps us streamline our data input interface with the django forms
+living at the API backend.
