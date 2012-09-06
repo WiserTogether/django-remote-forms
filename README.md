@@ -13,11 +13,57 @@ django Remote Admin [django-remote-admin](https://github.com/tarequeh/django-rem
 
 ### Minimal Example
 
-    from django_remote_forms.forms import RemoteForm
+```python
+from django_remote_forms.forms import RemoteForm
 
-    form = LoginForm()
+form = LoginForm()
+remote_form = RemoteForm(form)
+remote_form_dict = remote_form.as_dict()
+```
+
+### An API endpoint serving remote forms
+
+```python
+from django.core.serializers.json import simplejson as json, DjangoJSONEncoder
+from django.http import HttpResponse
+from django.middleware.csrf import CsrfViewMiddleware
+from django.views.decorators.csrf import csrf_exempt
+
+from django_remote_forms.forms import RemoteForm
+
+from my_awesome_project.forms import MyAwesomeForm
+
+
+@csrf_exempt
+def my_ajax_view(request):
+    csrf_middleware = CsrfViewMiddleware()
+
+    response_data = {}
+    if request.method == 'GET':
+        # Get form definition
+        form = MyAwesomeForm()
+    elif request.raw_post_data:
+        request.POST = json.loads(request.raw_post_data)
+        # Process request for CSRF
+        csrf_middleware.process_view(request, None, None, None)
+        form_data = request.POST.get('data', {})
+        form = MyAwesomeForm(form_data)
+        if form.is_valid():
+            form.save()
+
     remote_form = RemoteForm(form)
-    remote_form_dict = remote_form.as_dict()
+    # Errors in response_data['non_field_errors'] and response_data['errors']
+    response_data.update(remote_form.as_dict())
+
+    response = HttpResponse(
+        json.dumps(response_data, cls=DjangoJSONEncoder),
+        mimetype="application/json"
+    )
+
+    # Process response for CSRF
+    csrf_middleware.process_response(request, response)
+    return response
+```
 
 ## Resources from djangocon US 2012
 
@@ -61,7 +107,7 @@ then read on.
 >independent fashion so that it can be consumed by any frontend application that renders HTML. Such
 >information includes but is not limited to basic form configurations, security tokens (if
 >necessary), rendering metadata and error handling instructions. We lovingly name this architecture
->- django-remote-forms.
+>django-remote-forms.
 
 >At WiserTogether, we are in the process of building a component based architecture that strictly
 >provides data endpoints for frontend applications to consume. We are working towards developing
