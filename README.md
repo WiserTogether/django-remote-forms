@@ -7,7 +7,7 @@ dictionary for easy conversion into JSON and expose over API
 
 ### Minimal Example
 
-```python
+```py
 from django_remote_forms.forms import RemoteForm
 
 form = LoginForm()
@@ -15,9 +15,13 @@ remote_form = RemoteForm(form)
 remote_form_dict = remote_form.as_dict()
 ```
 
-## djangocon US 2012 Presentation
+## djangocon US 2012
 
-[slideshare id=14181450&doc=bravenewforms-120905161907-phpapp01]
+### Presentation
+
+Please go through my [djangocon US 2012 talk](http://www.slideshare.net/tarequeh/django-forms-in-a-web-api-world)
+to understand the problem sphere, motivations, sample remote form output and example implementation
+of Remote Forms
 
 ## djangocon US 2012 Talk Proposal
 
