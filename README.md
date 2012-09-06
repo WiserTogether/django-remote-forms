@@ -3,6 +3,9 @@
 A package that allows you to serialize django forms, including fields and widgets into Python
 dictionary for easy conversion into JSON and expose over API
 
+Please go through my [djangocon US 2012 talk](http://www.slideshare.net/tarequeh/django-forms-in-a-web-api-world)
+to understand the problem sphere, motivations, challenges and implementation of Remote Forms
+
 ## Sample Implementation
 
 If you don't mind digging around a little bit to learn about different the components that might be
@@ -133,15 +136,7 @@ def my_ajax_view(request):
     return response
 ```
 
-## Resources from djangocon US 2012
-
-### Presentation
-
-Please go through my [djangocon US 2012 talk](http://www.slideshare.net/tarequeh/django-forms-in-a-web-api-world)
-to understand the problem sphere, motivations, sample remote form output and example implementation
-of Remote Forms
-
-### Original Proposal
+## djangocon Proposal
 
 This is a bit lengthy. But if you want to know more about my motivations behind developing django-remote-forms
 then read on.
