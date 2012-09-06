@@ -1,5 +1,25 @@
-Motivation
-----------
+# django-remote-forms
+
+A package that allows you to serialize django forms, including fields and widgets into Python
+dictionary for easy conversion into JSON and expose over API
+
+## Usage
+
+### Minimal Example
+
+```python
+from django_remote_forms.forms import RemoteForm
+
+form = LoginForm()
+remote_form = RemoteForm(form)
+remote_form_dict = remote_form.as_dict()
+```
+
+## djangocon US 2012 Presentation
+
+[slideshare id=14181450&doc=bravenewforms-120905161907-phpapp01]
+
+## djangocon US 2012 Talk Proposal
 
 In our quest to modularize the architecture of web applications, we create self-containing backend systems that provide web APIs for programmatic interactions. This gives us the flexibility to separate different system components. A system with multiple backend components e.g. user profile engine, content engine, community engine, analytics engine may have a single frontend application that fetches data from all of these components using respective web APIs.
 
