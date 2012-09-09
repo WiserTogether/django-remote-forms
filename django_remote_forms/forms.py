@@ -107,6 +107,7 @@ class RemoteForm(object):
         form_dict['prefix'] = self.form.prefix
         form_dict['fields'] = SortedDict()
         form_dict['errors'] = self.form.errors
+        form_dict['fieldsets'] = getattr(self.form, 'fieldsets', [])
 
         initial_data = {}
 
