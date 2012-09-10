@@ -1,31 +1,23 @@
-from django.forms.util import ErrorList, ErrorDict
+from django.utils.functional import Promise
+from django.utils.translation import force_unicode
 
 
-def normalize_error_dict(error_dict):
-    normalized_error_dict = {}
-    for error_type, error_detail in error_dict.items():
-        if isinstance(error_detail, ErrorList):
-            error_detail = normalize_error_list(error_detail)
-        elif not isinstance(error_detail, (str, unicode)):
-            error_detail = unicode(error_detail)
+def resolve_promise(o):
+    if isinstance(o, dict):
+        for k, v in o.items():
+            o[k] = resolve_promise(v)
+    elif isinstance(o, (list, tuple)):
+        o = [resolve_promise(x) for x in o]
+    elif isinstance(o, Promise):
+        try:
+            o = force_unicode(o)
+        except:
+            # Item could be a lazy tuple or list
+            try:
+                o = [resolve_promise(x) for x in o]
+            except:
+                raise Exception('Unable to resolve lazy object %s' % o)
+    elif callable(o):
+            o = o()
 
-        normalized_error_dict[error_type] = error_detail
-
-    return normalized_error_dict
-
-
-def normalize_error_list(error_list):
-    if isinstance(error_list, ErrorList):
-        normalized_error_list = []
-        for error_message in error_list:
-            error_message = unicode(error_message)
-            normalized_error_list.append(error_message)
-
-
-def normalize_errors(error_container):
-    if isinstance(error_container, ErrorList):
-        return normalize_error_list(error_container)
-    elif isinstance(error_container, (dict, ErrorDict)):
-        return normalize_error_dict(error_container)
-    else:
-        return error_container
+    return o

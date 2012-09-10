@@ -1,7 +1,9 @@
+import datetime
+
+from django.conf import settings
 from django.utils.datastructures import SortedDict
 
 from django_remote_forms import logger, widgets
-from django_remote_forms.utils import normalize_errors
 
 
 class RemoteField(object):
@@ -29,16 +31,16 @@ class RemoteField(object):
         field_dict['initial'] = self.form_initial_data or self.field.initial
         field_dict['help_text'] = self.field.help_text
 
-        field_dict['error_messages'] = normalize_errors(self.field.error_messages)
+        field_dict['error_messages'] = self.field.error_messages
 
         # Instantiate the Remote Forms equivalent of the widget if possible
         # in order to retrieve the widget contents as a dictionary.
+        remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
         try:
-            remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
             remote_widget_class = getattr(widgets, remote_widget_class_name)
             remote_widget = remote_widget_class(self.field.widget, field_name=self.field_name)
         except Exception, e:
-            logger.warning('Error serializing %s: %s', remote_widget_class, str(e))
+            logger.warning('Error serializing %s: %s', remote_widget_class_name, str(e))
             widget_dict = {}
         else:
             widget_dict = remote_widget.as_dict()
@@ -89,38 +91,48 @@ class RemoteDecimalField(RemoteIntegerField):
         return field_dict
 
 
-class RemoteDateField(RemoteField):
-    def as_dict(self):
-        field_dict = super(RemoteDateField, self).as_dict()
-
-        field_dict['input_formats'] = self.field.input_formats
-
-        return field_dict
-
-
 class RemoteTimeField(RemoteField):
     def as_dict(self):
         field_dict = super(RemoteTimeField, self).as_dict()
 
         field_dict['input_formats'] = self.field.input_formats
 
+        if (field_dict['initial']):
+            if callable(field_dict['initial']):
+                field_dict['initial'] = field_dict['initial']()
+
+            # If initial value is datetime then convert it using first available input format
+            if (isinstance(field_dict['initial'], (datetime.datetime, datetime.time, datetime.date))):
+                if not len(field_dict['input_formats']):
+                    if isinstance(field_dict['initial'], datetime.date):
+                        field_dict['input_formats'] = settings.DATE_INPUT_FORMATS
+                    elif isinstance(field_dict['initial'], datetime.time):
+                        field_dict['input_formats'] = settings.TIME_INPUT_FORMATS
+                    elif isinstance(field_dict['initial'], datetime.datetime):
+                        field_dict['input_formats'] = settings.DATETIME_INPUT_FORMATS
+
+                input_format = field_dict['input_formats'][0]
+                field_dict['initial'] = field_dict['initial'].strftime(input_format)
+
         return field_dict
 
 
-class RemoteDateTimeField(RemoteField):
+class RemoteDateField(RemoteTimeField):
     def as_dict(self):
-        field_dict = super(RemoteDateTimeField, self).as_dict()
+        return super(RemoteDateField, self).as_dict()
 
-        field_dict['input_formats'] = self.field.input_formats
 
-        return field_dict
+class RemoteDateTimeField(RemoteTimeField):
+    def as_dict(self):
+        return super(RemoteDateTimeField, self).as_dict()
 
 
 class RemoteRegexField(RemoteCharField):
     def as_dict(self):
         field_dict = super(RemoteRegexField, self).as_dict()
 
-        field_dict['regex'] = self.field.regex
+        # We don't need the pattern object in the frontend
+        # field_dict['regex'] = self.field.regex
 
         return field_dict
 
@@ -173,6 +185,11 @@ class RemoteChoiceField(RemoteField):
         return field_dict
 
 
+class RemoteModelChoiceField(RemoteChoiceField):
+    def as_dict(self):
+        return super(RemoteModelChoiceField, self).as_dict()
+
+
 class RemoteTypedChoiceField(RemoteChoiceField):
     def as_dict(self):
         field_dict = super(RemoteTypedChoiceField, self).as_dict()
@@ -188,6 +205,11 @@ class RemoteTypedChoiceField(RemoteChoiceField):
 class RemoteMultipleChoiceField(RemoteChoiceField):
     def as_dict(self):
         return super(RemoteMultipleChoiceField, self).as_dict()
+
+
+class RemoteModelMultipleChoiceField(RemoteMultipleChoiceField):
+    def as_dict(self):
+        return super(RemoteModelMultipleChoiceField, self).as_dict()
 
 
 class RemoteTypedMultipleChoiceField(RemoteMultipleChoiceField):
@@ -215,7 +237,7 @@ class RemoteMultiValueField(RemoteField):
     def as_dict(self):
         field_dict = super(RemoteMultiValueField, self).as_dict()
 
-        field_dict.update(fields=self.field.fields)
+        field_dict['fields'] = self.field.fields
 
         return field_dict
 
