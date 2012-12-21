@@ -109,6 +109,9 @@ class RemoteForm(object):
         form_dict['errors'] = self.form.errors
         form_dict['fieldsets'] = getattr(self.form, 'fieldsets', [])
 
+        # If there are no fieldsets, specify order
+        form_dict['ordered_fields'] = self.fields
+
         initial_data = {}
 
         for name, field in [(x, self.form.fields[x]) for x in self.fields]:
