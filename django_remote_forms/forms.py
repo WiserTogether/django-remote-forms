@@ -119,14 +119,14 @@ class RemoteForm(object):
             # Please refer to the Django Form API documentation for details on
             # why this is necessary:
             # https://docs.djangoproject.com/en/dev/ref/forms/api/#dynamic-initial-values
-            form_initial_data = getattr(self.form.initial, name, None)
+            form_initial_field_data = self.form.initial.get(name)
 
             # Instantiate the Remote Forms equivalent of the field if possible
             # in order to retrieve the field contents as a dictionary.
             remote_field_class_name = 'Remote%s' % field.__class__.__name__
             try:
                 remote_field_class = getattr(fields, remote_field_class_name)
-                remote_field = remote_field_class(field, form_initial_data, field_name=name)
+                remote_field = remote_field_class(field, form_initial_field_data, field_name=name)
             except Exception, e:
                 logger.warning('Error serializing field %s: %s', remote_field_class_name, str(e))
                 field_dict = {}
