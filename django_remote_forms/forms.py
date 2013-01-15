@@ -111,7 +111,7 @@ class RemoteForm(object):
 
         initial_data = {}
 
-        for name, field in [(x, self.form.fields[x]) for x in self.fields]:
+        for field in (x for x in self.form if x.name in self.fields):
             # Retrieve the initial data from the form itself if it exists so
             # that we properly handle which initial data should be returned in
             # the dictionary.
@@ -119,30 +119,30 @@ class RemoteForm(object):
             # Please refer to the Django Form API documentation for details on
             # why this is necessary:
             # https://docs.djangoproject.com/en/dev/ref/forms/api/#dynamic-initial-values
-            form_initial_field_data = self.form.initial.get(name)
+            form_initial_field_data = self.form.initial.get(field.name)
 
             # Instantiate the Remote Forms equivalent of the field if possible
             # in order to retrieve the field contents as a dictionary.
-            remote_field_class_name = 'Remote%s' % field.__class__.__name__
+            remote_field_class_name = 'Remote%s' % field.field.__class__.__name__
             try:
                 remote_field_class = getattr(fields, remote_field_class_name)
-                remote_field = remote_field_class(field, form_initial_field_data, field_name=name)
+                remote_field = remote_field_class(field, form_initial_field_data)
             except Exception, e:
                 logger.warning('Error serializing field %s: %s', remote_field_class_name, str(e))
                 field_dict = {}
             else:
                 field_dict = remote_field.as_dict()
 
-            if name in self.readonly_fields:
+            if field.name in self.readonly_fields:
                 field_dict['readonly'] = True
 
-            form_dict['fields'][name] = field_dict
+            form_dict['fields'][field.name] = field_dict
 
             # Load the initial data, which is a conglomerate of form initial and field initial
-            if 'initial' not in form_dict['fields'][name]:
-                form_dict['fields'][name]['initial'] = None
+            if 'initial' not in form_dict['fields'][field.name]:
+                form_dict['fields'][field.name]['initial'] = None
 
-            initial_data[name] = form_dict['fields'][name]['initial']
+            initial_data[field.name] = form_dict['fields'][field.name]['initial']
 
         if self.form.data:
             form_dict['data'] = self.form.data
