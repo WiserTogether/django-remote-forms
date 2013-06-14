@@ -194,10 +194,11 @@ class RemoteTypedChoiceField(RemoteChoiceField):
     def as_dict(self):
         field_dict = super(RemoteTypedChoiceField, self).as_dict()
 
-        field_dict.update({
-            'coerce': self.coerce,
-            'empty_value': self.empty_value
-        })
+        if hasattr(self, "coerce"):
+            field_dict.update({'coerce': self.coerce})
+
+        if hasattr(self, "empty_value"):
+            field_dict.update({'empty_value': self.empty_value})
 
         return field_dict
 
@@ -216,10 +217,11 @@ class RemoteTypedMultipleChoiceField(RemoteMultipleChoiceField):
     def as_dict(self):
         field_dict = super(RemoteTypedMultipleChoiceField, self).as_dict()
 
-        field_dict.update({
-            'coerce': self.coerce,
-            'empty_value': self.empty_value
-        })
+        if hasattr(self, "coerce"):
+            field_dict.update({'coerce': self.coerce})
+
+        if hasattr(self, "empty_value"):
+            field_dict.update({'empty_value': self.empty_value})
 
         return field_dict
 
