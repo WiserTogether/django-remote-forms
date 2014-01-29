@@ -144,7 +144,7 @@ class RemoteEmailField(RemoteCharField):
 
 class RemoteFileField(RemoteField):
     def as_dict(self):
-        field_dict = super(RemoteField, self).as_dict()
+        field_dict = super(RemoteFileField, self).as_dict()
 
         field_dict['max_length'] = self.field.max_length
 
