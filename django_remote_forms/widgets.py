@@ -45,6 +45,21 @@ class RemoteHiddenInput(RemoteInput):
         return super(RemoteHiddenInput, self).as_dict()
 
 
+class RemoteEmailInput(RemoteInput):
+    def as_dict(self):
+        return super(RemoteEmailInput, self).as_dict()
+
+
+class RemoteNumberInput(RemoteInput):
+    def as_dict(self):
+        return super(RemoteNumberInput, self).as_dict()
+
+
+class RemoteURLInput(RemoteInput):
+    def as_dict(self):
+        return super(RemoteURLInput, self).as_dict()
+
+
 class RemoteMultipleHiddenInput(RemoteHiddenInput):
     def as_dict(self):
         widget_dict = super(RemoteMultipleHiddenInput, self).as_dict()
