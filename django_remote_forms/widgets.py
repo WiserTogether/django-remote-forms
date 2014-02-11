@@ -50,7 +50,8 @@ class RemoteEmailInput(RemoteInput):
         widget_dict = super(RemoteEmailInput, self).as_dict()
 
         widget_dict['title'] = 'TextInput'
-        
+        widget_dict['input_type'] = 'text'
+
         return widget_dict
 
 
