@@ -60,6 +60,7 @@ class RemoteNumberInput(RemoteInput):
         widget_dict = super(RemoteNumberInput, self).as_dict()
 
         widget_dict['title'] = 'TextInput'
+        widget_dict['input_type'] = 'text'
 
         return widget_dict
 
@@ -69,6 +70,7 @@ class RemoteURLInput(RemoteInput):
         widget_dict = super(RemoteURLInput, self).as_dict()
 
         widget_dict['title'] = 'TextInput'
+        widget_dict['input_type'] = 'text'
 
         return widget_dict
 
