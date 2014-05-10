@@ -72,6 +72,26 @@ class RemoteForm(object):
             logger.warning('Following fieldset fields are excluded %s' % (fieldset_fields - set(self.fields)))
             self.fieldsets = {}
 
+    def get_remote_field_class(self, name, field):
+        remote_field_class_name = 'Remote%s' % field.__class__.__name__
+        remote_field_class = getattr(fields, remote_field_class_name)
+        return remote_field_class
+
+    def get_field_dict(self, name, field):
+        form_initial_field_data = self.form.initial.get(name)
+        # Instantiate the Remote Forms equivalent of the field if possible
+        # in order to retrieve the field contents as a dictionary.
+        try:
+            remote_field_class = self.get_remote_field_class(name, field)
+            remote_field = remote_field_class(field, form_initial_field_data,
+                                              field_name=name)
+        except Exception, e:
+            logger.warning('Error serializing field %s: %s', name, e)
+            field_dict = {}
+        else:
+            field_dict = remote_field.as_dict()
+        return field_dict
+
     def as_dict(self):
         """
         Returns a form as a dictionary that looks like the following:
@@ -122,19 +142,7 @@ class RemoteForm(object):
             # Please refer to the Django Form API documentation for details on
             # why this is necessary:
             # https://docs.djangoproject.com/en/dev/ref/forms/api/#dynamic-initial-values
-            form_initial_field_data = self.form.initial.get(name)
-
-            # Instantiate the Remote Forms equivalent of the field if possible
-            # in order to retrieve the field contents as a dictionary.
-            remote_field_class_name = 'Remote%s' % field.__class__.__name__
-            try:
-                remote_field_class = getattr(fields, remote_field_class_name)
-                remote_field = remote_field_class(field, form_initial_field_data, field_name=name)
-            except Exception, e:
-                logger.warning('Error serializing field %s: %s', remote_field_class_name, str(e))
-                field_dict = {}
-            else:
-                field_dict = remote_field.as_dict()
+            field_dict = self.get_field_dict(name, field)
 
             if name in self.readonly_fields:
                 field_dict['readonly'] = True

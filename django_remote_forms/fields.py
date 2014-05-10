@@ -23,6 +23,27 @@ class RemoteField(object):
         self.field = field
         self.form_initial_data = form_initial_data
 
+    def get_widget_class(self):
+        remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
+        remote_widget_class = getattr(widgets, remote_widget_class_name)
+        return remote_widget_class
+
+    def get_widget_dict(self):
+        # Instantiate the Remote Forms equivalent of the widget if possible
+        # in order to retrieve the widget contents as a dictionary.
+        try:
+            remote_widget_class = self.get_widget_class()
+            remote_widget = remote_widget_class(
+                self.field.widget, field_name=self.field_name)
+        except Exception, e:
+            logger.warning(
+                'Error serializing %s: %s',
+                self.field.widget.__class__.__name__, e)
+            widget_dict = {}
+        else:
+            widget_dict = remote_widget.as_dict()
+        return widget_dict
+
     def as_dict(self):
         field_dict = SortedDict()
         field_dict['title'] = self.field.__class__.__name__
@@ -33,17 +54,7 @@ class RemoteField(object):
 
         field_dict['error_messages'] = self.field.error_messages
 
-        # Instantiate the Remote Forms equivalent of the widget if possible
-        # in order to retrieve the widget contents as a dictionary.
-        remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
-        try:
-            remote_widget_class = getattr(widgets, remote_widget_class_name)
-            remote_widget = remote_widget_class(self.field.widget, field_name=self.field_name)
-        except Exception, e:
-            logger.warning('Error serializing %s: %s', remote_widget_class_name, str(e))
-            widget_dict = {}
-        else:
-            widget_dict = remote_widget.as_dict()
+        widget_dict = self.get_widget_dict()
 
         field_dict['widget'] = widget_dict
 
