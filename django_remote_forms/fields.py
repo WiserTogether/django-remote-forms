@@ -16,20 +16,24 @@ class RemoteField(object):
     specified on the field per Django's rules:
 
     https://docs.djangoproject.com/en/dev/ref/forms/api/#dynamic-initial-values
+
+    `bound_field` is the BoundField returned from iterating over the form.
     """
 
-    def __init__(self, field, form_initial_data=None, field_name=None):
-        self.field_name = field_name
-        self.field = field
+    def __init__(self, bound_field, form_initial_data=None):
+        self.name = bound_field.name
+        self.label = bound_field.label
+        self.help_text = bound_field.help_text
+        self.field = bound_field.field
         self.form_initial_data = form_initial_data
 
     def as_dict(self):
         field_dict = SortedDict()
-        field_dict['title'] = self.field.__class__.__name__
+        field_dict['title'] = self.name
         field_dict['required'] = self.field.required
-        field_dict['label'] = self.field.label
+        field_dict['label'] = self.label
         field_dict['initial'] = self.form_initial_data or self.field.initial
-        field_dict['help_text'] = self.field.help_text
+        field_dict['help_text'] = self.help_text
 
         field_dict['error_messages'] = self.field.error_messages
 
@@ -38,7 +42,7 @@ class RemoteField(object):
         remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
         try:
             remote_widget_class = getattr(widgets, remote_widget_class_name)
-            remote_widget = remote_widget_class(self.field.widget, field_name=self.field_name)
+            remote_widget = remote_widget_class(self.field.widget, field_name=self.name)
         except Exception, e:
             logger.warning('Error serializing %s: %s', remote_widget_class_name, str(e))
             widget_dict = {}
