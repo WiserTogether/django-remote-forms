@@ -111,9 +111,11 @@ class RemoteTimeInput(RemoteInput):
     def as_dict(self):
         widget_dict = super(RemoteTimeInput, self).as_dict()
 
+        manual_format = self.widget.format is None
+
         widget_dict['format'] = self.widget.format
-        widget_dict['manual_format'] = self.widget.manual_format
-        widget_dict['date'] = self.widget.manual_format
+        widget_dict['manual_format'] = manual_format
+        widget_dict['date'] = manual_format
         widget_dict['input_type'] = 'time'
 
         return widget_dict
