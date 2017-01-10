@@ -1,7 +1,7 @@
 import datetime
 
 from django.utils.dates import MONTHS
-from django.utils.datastructures import SortedDict
+from collections import OrderedDict as SortedDict
 
 
 class RemoteWidget(object):
