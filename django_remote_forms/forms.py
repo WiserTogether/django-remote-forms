@@ -1,5 +1,4 @@
-from django.utils.datastructures import SortedDict
-
+from collections import OrderedDict as SortedDict
 from django_remote_forms import fields, logger
 from django_remote_forms.utils import resolve_promise
 
@@ -43,10 +42,7 @@ class RemoteForm(object):
         self.excluded_fields |= (self.included_fields - self.all_fields)
 
         if not self.ordered_fields:
-            if self.form.fields.keyOrder:
-                self.ordered_fields = self.form.fields.keyOrder
-            else:
-                self.ordered_fields = self.form.fields.keys()
+            self.ordered_fields = self.form.fields.keys()
 
         self.fields = []
 
