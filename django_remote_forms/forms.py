@@ -1,4 +1,4 @@
-from django.utils.datastructures import SortedDict
+from collections import OrderedDict
 
 from django_remote_forms import fields, logger
 from django_remote_forms.utils import resolve_promise
@@ -19,23 +19,31 @@ class RemoteForm(object):
 
         # Make sure all passed field lists are valid
         if self.excluded_fields and not (self.all_fields >= self.excluded_fields):
-            logger.warning('Excluded fields %s are not present in form fields' % (self.excluded_fields - self.all_fields))
+            logger.warning(
+                'Excluded fields %s are not present in form fields' % (self.excluded_fields - self.all_fields))
             self.excluded_fields = set()
 
         if self.included_fields and not (self.all_fields >= self.included_fields):
-            logger.warning('Included fields %s are not present in form fields' % (self.included_fields - self.all_fields))
+            logger.warning(
+                'Included fields %s are not present in form fields' % (self.included_fields - self.all_fields))
             self.included_fields = set()
 
         if self.readonly_fields and not (self.all_fields >= self.readonly_fields):
-            logger.warning('Readonly fields %s are not present in form fields' % (self.readonly_fields - self.all_fields))
+            logger.warning(
+                'Readonly fields %s are not present in form fields' % (self.readonly_fields - self.all_fields))
             self.readonly_fields = set()
 
         if self.ordered_fields and not (self.all_fields >= set(self.ordered_fields)):
-            logger.warning('Readonly fields %s are not present in form fields' % (set(self.ordered_fields) - self.all_fields))
+            logger.warning(
+                'Readonly fields %s are not present in form fields' % (set(self.ordered_fields) - self.all_fields))
             self.ordered_fields = []
 
         if self.included_fields | self.excluded_fields:
-            logger.warning('Included and excluded fields have following fields %s in common' % (set(self.ordered_fields) - self.all_fields))
+            logger.warning(
+                'Included and excluded fields have following fields %s in common' % (
+                    set(self.ordered_fields) - self.all_fields
+                )
+            )
             self.excluded_fields = set()
             self.included_fields = set()
 
@@ -99,13 +107,13 @@ class RemoteForm(object):
             }
         }
         """
-        form_dict = SortedDict()
+        form_dict = OrderedDict()
         form_dict['title'] = self.form.__class__.__name__
         form_dict['non_field_errors'] = self.form.non_field_errors()
         form_dict['label_suffix'] = self.form.label_suffix
         form_dict['is_bound'] = self.form.is_bound
         form_dict['prefix'] = self.form.prefix
-        form_dict['fields'] = SortedDict()
+        form_dict['fields'] = OrderedDict()
         form_dict['errors'] = self.form.errors
         form_dict['fieldsets'] = getattr(self.form, 'fieldsets', [])
 
