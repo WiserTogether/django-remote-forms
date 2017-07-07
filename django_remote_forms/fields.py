@@ -32,22 +32,6 @@ class RemoteField(object):
         field_dict['initial'] = self.form_initial_data or self.field.initial
         field_dict['help_text'] = self.field.help_text
 
-        field_dict['error_messages'] = self.field.error_messages
-
-        # Instantiate the Remote Forms equivalent of the widget if possible
-        # in order to retrieve the widget contents as a dictionary.
-        remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
-        try:
-            remote_widget_class = getattr(widgets, remote_widget_class_name)
-            remote_widget = remote_widget_class(self.field.widget, field_name=self.field_name)
-        except Exception as e:
-            logger.warning('Error serializing %s: %s', remote_widget_class_name, str(e))
-            widget_dict = {}
-        else:
-            widget_dict = remote_widget.as_dict()
-
-        field_dict['widget'] = widget_dict
-
         return field_dict
 
 

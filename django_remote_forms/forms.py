@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from django import forms
 
 from django_remote_forms import fields, logger
 from django_remote_forms.utils import resolve_promise
@@ -38,7 +39,7 @@ class RemoteForm(object):
                 'Readonly fields %s are not present in form fields' % (set(self.ordered_fields) - self.all_fields))
             self.ordered_fields = []
 
-        if self.included_fields | self.excluded_fields:
+        if self.included_fields & self.excluded_fields:
             logger.warning(
                 'Included and excluded fields have following fields %s in common' % (
                     set(self.ordered_fields) - self.all_fields
@@ -134,7 +135,16 @@ class RemoteForm(object):
 
             # Instantiate the Remote Forms equivalent of the field if possible
             # in order to retrieve the field contents as a dictionary.
-            remote_field_class_name = 'Remote%s' % field.__class__.__name__
+            # remote_field_class_name = 'Remote%s' % field.__class__.__name__
+            remote_field_class_name = 'RemoteField'
+            if issubclass(field.__class__, forms.DateField):
+                remote_field_class_name = 'Remote{}'.format('DateField')
+            elif issubclass(field.__class__, forms.TimeField):
+                remote_field_class_name = 'Remote{}'.format('TimeField')
+            elif issubclass(field.__class__, forms.DateTimeField):
+                remote_field_class_name = 'Remote{}'.format('DateTimeField')
+            elif issubclass(field.__class__, forms.ChoiceField):
+                remote_field_class_name = 'Remote{}'.format('ChoiceField')
             try:
                 remote_field_class = getattr(fields, remote_field_class_name)
                 remote_field = remote_field_class(field, form_initial_field_data, field_name=name)
