@@ -1,5 +1,9 @@
 from django.utils.functional import Promise
-from django.utils.encoding import force_unicode
+
+try:
+    from django.utils.encoding import force_unicode  # Django in Python 2
+except ImportError:
+    from django.utils.encoding import force_text as force_unicode  # Django in Python 3
 
 
 def resolve_promise(o):

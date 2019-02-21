@@ -9,7 +9,7 @@ except ImportError:
 
 setup(
     name='django-remote-forms',
-    version='0.0.1',
+    version='0.0.2',
     description='A platform independent form serializer for Django.',
     author='WiserTogether Tech Team',
     author_email='tech@wisertogether.com',
