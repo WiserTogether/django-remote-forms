@@ -40,7 +40,7 @@ class RemoteField(object):
         try:
             remote_widget_class = getattr(widgets, remote_widget_class_name)
             remote_widget = remote_widget_class(self.field.widget, field_name=self.field_name)
-        except Exception, e:
+        except Exception as e:
             logger.warning('Error serializing %s: %s', remote_widget_class_name, str(e))
             widget_dict = {}
         else:
