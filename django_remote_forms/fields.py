@@ -40,7 +40,7 @@ class RemoteField(object):
         try:
             remote_widget_class = getattr(widgets, remote_widget_class_name)
             remote_widget = remote_widget_class(self.field.widget, field_name=self.field_name)
-        except Exception, e:
+        except Exception as e:
             logger.warning('Error serializing %s: %s', remote_widget_class_name, str(e))
             widget_dict = {}
         else:
@@ -104,7 +104,7 @@ class RemoteTimeField(RemoteField):
 
             # If initial value is datetime then convert it using first available input format
             if (isinstance(field_dict['initial'], (datetime.datetime, datetime.time, datetime.date))):
-                if not len(field_dict['input_formats']):
+                if not getattr(field_dict['input_formats'], 'len', None):
                     if isinstance(field_dict['initial'], datetime.date):
                         field_dict['input_formats'] = settings.DATE_INPUT_FORMATS
                     elif isinstance(field_dict['initial'], datetime.time):
