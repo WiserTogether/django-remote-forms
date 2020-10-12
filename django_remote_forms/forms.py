@@ -124,8 +124,7 @@ class RemoteForm(object):
 
         initial_data = {}
 
-        for name, field in [(x, self.form.fields[x]) for x in self.fields]:
-            print('     ', name, field)
+        for name, field in [(x, self.form.fields[x]) for x in self.fields]:            
             # Retrieve the initial data from the form itself if it exists so
             # that we properly handle which initial data should be returned in
             # the dictionary.
@@ -165,5 +164,5 @@ class RemoteForm(object):
             form_dict['data'] = self.form.data
         else:
             form_dict['data'] = initial_data
-        print(form_dict)
+        
         return resolve_promise(form_dict)

@@ -175,7 +175,6 @@ class RemoteNullBooleanField(RemoteBooleanField):
 class RemoteChoiceField(RemoteField):
     def as_dict(self):
         field_dict = super(RemoteChoiceField, self).as_dict()
-
         field_dict['choices'] = []
         for key, value in self.field.choices:
             field_dict['choices'].append({
@@ -188,7 +187,21 @@ class RemoteChoiceField(RemoteField):
 
 class RemoteModelChoiceField(RemoteChoiceField):
     def as_dict(self):
-        return super(RemoteModelChoiceField, self).as_dict()
+        form_as_dict = super(RemoteModelChoiceField, self).as_dict()
+        
+        field = self.__dict__.get('field', {})
+        if hasattr(field, '_queryset'):
+            queryset   = self.__dict__['field'].__dict__['_queryset']
+            model      = queryset.model()
+            app_name   = model.app_name if hasattr(model, 'app_name') else None
+            model_name = model.model_name if hasattr(model, 'model_name') else None
+        
+            form_as_dict.update({
+                'app_name'   : app_name,
+                'model_name' : model_name,
+            })
+
+        return form_as_dict
 
 
 class RemoteTypedChoiceField(RemoteChoiceField):
