@@ -1,7 +1,7 @@
 from django.utils.functional import Promise
 from django.utils.encoding import force_text
 from django.forms.models import ModelChoiceIteratorValue
-
+from django.db import models
 
 def resolve_promise(o):
     if isinstance(o, dict):
@@ -22,5 +22,9 @@ def resolve_promise(o):
                 raise Exception('Unable to resolve lazy object %s' % o)
     elif callable(o):
         o = o()
-
+    elif isinstance(o, models.Model): # New treatment for models instances, return the model instance id
+        try:
+            o = o.id
+        except Exception as e:
+            print(e)
     return o
