@@ -6,6 +6,7 @@ from django.conf import settings
 
 from django_remote_forms import logger, widgets
 
+from django.utils.translation   import gettext as _
 
 class RemoteField(object):
     """
@@ -28,7 +29,7 @@ class RemoteField(object):
         field_dict = OrderedDict()
         field_dict['title'] = self.field.__class__.__name__
         field_dict['required'] = self.field.required
-        field_dict['label'] = self.field.label
+        field_dict['label'] = _(' '.join(list(map(lambda x: x.capitalize(), self.field.label.split(' ')))))
         field_dict['initial'] = self.form_initial_data or self.field.initial
         field_dict['help_text'] = self.field.help_text
 
@@ -37,10 +38,13 @@ class RemoteField(object):
         # Instantiate the Remote Forms equivalent of the widget if possible
         # in order to retrieve the widget contents as a dictionary.
         remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
+        if hasattr(self.field.widget, 'parent_class'):
+            remote_widget_class_name = 'Remote%s' % self.field.widget.parent_class
+
         try:
             remote_widget_class = getattr(widgets, remote_widget_class_name)
             remote_widget = remote_widget_class(self.field.widget, field_name=self.field_name)
-        except Exception, e:
+        except Exception as e:
             logger.warning('Error serializing %s: %s', remote_widget_class_name, str(e))
             widget_dict = {}
         else:
@@ -48,6 +52,9 @@ class RemoteField(object):
 
         field_dict['widget'] = widget_dict
 
+        if hasattr(self.field.widget, 'input_type'):
+            field_dict['widget']['input_type'] = self.field.widget.input_type
+            
         return field_dict
 
 
@@ -104,7 +111,7 @@ class RemoteTimeField(RemoteField):
 
             # If initial value is datetime then convert it using first available input format
             if (isinstance(field_dict['initial'], (datetime.datetime, datetime.time, datetime.date))):
-                if not len(field_dict['input_formats']):
+                if not getattr(field_dict['input_formats'], 'len', None):
                     if isinstance(field_dict['initial'], datetime.date):
                         field_dict['input_formats'] = settings.DATE_INPUT_FORMATS
                     elif isinstance(field_dict['initial'], datetime.time):
@@ -125,6 +132,7 @@ class RemoteDateField(RemoteTimeField):
 
 class RemoteDateTimeField(RemoteTimeField):
     def as_dict(self):
+        print('RemoteDateTimeField')
         return super(RemoteDateTimeField, self).as_dict()
 
 
@@ -175,7 +183,6 @@ class RemoteNullBooleanField(RemoteBooleanField):
 class RemoteChoiceField(RemoteField):
     def as_dict(self):
         field_dict = super(RemoteChoiceField, self).as_dict()
-
         field_dict['choices'] = []
         for key, value in self.field.choices:
             field_dict['choices'].append({
@@ -188,7 +195,21 @@ class RemoteChoiceField(RemoteField):
 
 class RemoteModelChoiceField(RemoteChoiceField):
     def as_dict(self):
-        return super(RemoteModelChoiceField, self).as_dict()
+        form_as_dict = super(RemoteModelChoiceField, self).as_dict()
+        
+        field = self.__dict__.get('field', {})
+        if hasattr(field, '_queryset'):
+            queryset   = self.__dict__['field'].__dict__['_queryset']
+            model      = queryset.model()
+            app_name   = model.app_name if hasattr(model, 'app_name') else None
+            model_name = model.model_name if hasattr(model, 'model_name') else None
+        
+            form_as_dict.update({
+                'app_name'   : app_name,
+                'model_name' : model_name,
+            })
+
+        return form_as_dict
 
 
 class RemoteTypedChoiceField(RemoteChoiceField):
@@ -210,7 +231,21 @@ class RemoteMultipleChoiceField(RemoteChoiceField):
 
 class RemoteModelMultipleChoiceField(RemoteMultipleChoiceField):
     def as_dict(self):
-        return super(RemoteModelMultipleChoiceField, self).as_dict()
+        form_as_dict = super(RemoteModelMultipleChoiceField, self).as_dict()
+        
+        field = self.__dict__.get('field', {})
+        if hasattr(field, '_queryset'):
+            queryset   = self.__dict__['field'].__dict__['_queryset']
+            model      = queryset.model()
+            app_name   = model.app_name if hasattr(model, 'app_name') else None
+            model_name = model.model_name if hasattr(model, 'model_name') else None
+        
+            form_as_dict.update({
+                'app_name'   : app_name,
+                'model_name' : model_name,
+            })
+
+        return form_as_dict
 
 
 class RemoteTypedMultipleChoiceField(RemoteMultipleChoiceField):
