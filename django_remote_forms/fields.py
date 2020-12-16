@@ -37,6 +37,9 @@ class RemoteField(object):
         # Instantiate the Remote Forms equivalent of the widget if possible
         # in order to retrieve the widget contents as a dictionary.
         remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
+        if hasattr(self.field.widget, 'parent_class'):
+            remote_widget_class_name = 'Remote%s' % self.field.widget.parent_class
+
         try:
             remote_widget_class = getattr(widgets, remote_widget_class_name)
             remote_widget = remote_widget_class(self.field.widget, field_name=self.field_name)
@@ -48,6 +51,9 @@ class RemoteField(object):
 
         field_dict['widget'] = widget_dict
 
+        if hasattr(self.field.widget, 'input_type'):
+            field_dict['widget']['input_type'] = self.field.widget.input_type
+            
         return field_dict
 
 
@@ -223,7 +229,21 @@ class RemoteMultipleChoiceField(RemoteChoiceField):
 
 class RemoteModelMultipleChoiceField(RemoteMultipleChoiceField):
     def as_dict(self):
-        return super(RemoteModelMultipleChoiceField, self).as_dict()
+        form_as_dict = super(RemoteModelMultipleChoiceField, self).as_dict()
+        
+        field = self.__dict__.get('field', {})
+        if hasattr(field, '_queryset'):
+            queryset   = self.__dict__['field'].__dict__['_queryset']
+            model      = queryset.model()
+            app_name   = model.app_name if hasattr(model, 'app_name') else None
+            model_name = model.model_name if hasattr(model, 'model_name') else None
+        
+            form_as_dict.update({
+                'app_name'   : app_name,
+                'model_name' : model_name,
+            })
+
+        return form_as_dict
 
 
 class RemoteTypedMultipleChoiceField(RemoteMultipleChoiceField):
