@@ -18,6 +18,22 @@ class RemoteWidget(object):
         widget_dict['is_required'] = self.widget.is_required
         widget_dict['attrs'] = self.widget.attrs
 
+        if hasattr(self.widget, 'related_field'):
+            widget_dict['related_field'] = self.widget.related_field
+
+        if hasattr(self.widget, 'choices'):
+            widget_dict['choices'] = []
+            for key, value, *data in self.widget.choices:
+                complementary_data = {}
+                if len(data) and type(data[0]) is dict:
+                    complementary_data = data[0]
+
+                widget_dict['choices'].append(dict(
+                    **complementary_data,
+                    value = key,
+                    display = value
+                ))
+
         return widget_dict
 
 
@@ -166,13 +182,6 @@ class RemoteSelect(RemoteWidget):
     def as_dict(self):
         widget_dict = super(RemoteSelect, self).as_dict()
 
-        widget_dict['choices'] = []
-        for key, value in self.widget.choices:
-            widget_dict['choices'].append({
-                'value': key,
-                'display': value
-            })
-
         widget_dict['input_type'] = 'select'
 
         return widget_dict
@@ -188,7 +197,7 @@ class RemoteSelectMultiple(RemoteSelect):
         widget_dict = super(RemoteSelectMultiple, self).as_dict()
 
         widget_dict['input_type'] = 'selectmultiple'
-        widget_dict['size'] = len(widget_dict['choices'])
+        widget_dict['size'] = len(widget_dict.get('choices', []))
 
         return widget_dict
 
