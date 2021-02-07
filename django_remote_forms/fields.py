@@ -29,7 +29,7 @@ class RemoteField(object):
         field_dict = OrderedDict()
         field_dict['title'] = self.field.__class__.__name__
         field_dict['required'] = self.field.required
-        field_dict['label'] = _(' '.join(list(map(lambda x: x.capitalize(), self.field.label.split(' ')))))
+        field_dict['label'] = _(self.field.label)
         field_dict['initial'] = self.form_initial_data or self.field.initial
         field_dict['help_text'] = self.field.help_text
 
@@ -132,7 +132,6 @@ class RemoteDateField(RemoteTimeField):
 
 class RemoteDateTimeField(RemoteTimeField):
     def as_dict(self):
-        print('RemoteDateTimeField')
         return super(RemoteDateTimeField, self).as_dict()
 
 
@@ -156,6 +155,7 @@ class RemoteFileField(RemoteField):
         field_dict = super(RemoteFileField, self).as_dict()
 
         field_dict['max_length'] = self.field.max_length
+        field_dict['initial'] = str(field_dict['initial'])
 
         return field_dict
 
