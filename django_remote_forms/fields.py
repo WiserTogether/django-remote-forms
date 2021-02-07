@@ -155,7 +155,7 @@ class RemoteFileField(RemoteField):
         field_dict = super(RemoteFileField, self).as_dict()
 
         field_dict['max_length'] = self.field.max_length
-        field_dict['initial'] = str(field_dict['initial'])
+        field_dict['initial'] = str(field_dict['initial']) if field_dict['initial'] is not None else None
 
         return field_dict
 
