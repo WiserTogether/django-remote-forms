@@ -138,7 +138,7 @@ class RemoteForm(object):
             try:
                 remote_field_class = getattr(fields, remote_field_class_name)
                 remote_field = remote_field_class(field, form_initial_field_data, field_name=name)
-            except Exception, e:
+            except Exception as e:
                 logger.warning('Error serializing field %s: %s', remote_field_class_name, str(e))
                 field_dict = {}
             else:
