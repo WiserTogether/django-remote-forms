@@ -123,6 +123,7 @@ class RemoteForm(object):
 
         initial_data = {}
         foreign_key_fields = []
+        comma_separated_fields = []
 
         for name, field in [(x, self.form.fields[x]) for x in self.fields]:
             # Retrieve the initial data from the form itself if it exists so
@@ -131,6 +132,9 @@ class RemoteForm(object):
 
             if type(field) in [ModelMultipleChoiceField]:
                 foreign_key_fields.append(name)
+            elif type(field) in [fields.CommaSeparatedField]:
+                comma_separated_fields.append(name)
+
             # Please refer to the Django Form API documentation for details on
             # why this is necessary:
             # https://docs.djangoproject.com/en/dev/ref/forms/api/#dynamic-initial-values
@@ -168,5 +172,12 @@ class RemoteForm(object):
             obj_list = form_dict['data'].get(field_name, [])
             if obj_list:
                 form_dict['data'][field_name] = [obj.pk for obj in obj_list]
+
+        for field_name in comma_separated_fields:
+            obj = form_dict['data'].get(field_name, '')
+            if obj:
+                form_dict['data'][field_name] = obj.split(',')
+            else:
+                form_dict['data'][field_name] = []
 
         return resolve_promise(form_dict)
