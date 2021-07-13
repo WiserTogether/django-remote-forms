@@ -5,6 +5,7 @@ from collections import OrderedDict
 from django.conf import settings
 
 from django_remote_forms import logger, widgets
+from django import forms
 
 
 class RemoteField(object):
@@ -208,6 +209,10 @@ class RemoteMultipleChoiceField(RemoteChoiceField):
         return super(RemoteMultipleChoiceField, self).as_dict()
 
 
+class RemoteCommaSeparatedField(RemoteMultipleChoiceField):
+    pass
+
+
 class RemoteModelMultipleChoiceField(RemoteMultipleChoiceField):
     def as_dict(self):
         return super(RemoteModelMultipleChoiceField, self).as_dict()
@@ -276,3 +281,16 @@ class RemoteIPAddressField(RemoteCharField):
 class RemoteSlugField(RemoteCharField):
     def as_dict(self):
         return super(RemoteSlugField, self).as_dict()
+
+
+class CommaSeparatedField(forms.MultipleChoiceField):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def prepare_value(self, value):
+        return value.split(',') if value else value
+
+    def clean(self, value):
+        value = super().clean(value)
+        return ','.join(value)

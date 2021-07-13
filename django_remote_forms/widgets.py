@@ -193,6 +193,10 @@ class RemoteSelectMultiple(RemoteSelect):
         return widget_dict
 
 
+class RemoteFilteredSelectMultiple(RemoteSelectMultiple):
+    pass
+
+
 class RemoteRadioInput(RemoteWidget):
     def as_dict(self):
         widget_dict = OrderedDict()

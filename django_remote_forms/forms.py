@@ -3,6 +3,7 @@ from collections import OrderedDict
 from django_remote_forms import fields, logger
 from django_remote_forms.utils import resolve_promise
 
+from django.forms import ModelMultipleChoiceField
 
 class RemoteForm(object):
     def __init__(self, form, *args, **kwargs):
@@ -121,11 +122,18 @@ class RemoteForm(object):
         form_dict['ordered_fields'] = self.fields
 
         initial_data = {}
+        foreign_key_fields = []
+        comma_separated_fields = []
 
         for name, field in [(x, self.form.fields[x]) for x in self.fields]:
             # Retrieve the initial data from the form itself if it exists so
             # that we properly handle which initial data should be returned in
             # the dictionary.
+
+            if type(field) in [ModelMultipleChoiceField]:
+                foreign_key_fields.append(name)
+            elif type(field) in [fields.CommaSeparatedField]:
+                comma_separated_fields.append(name)
 
             # Please refer to the Django Form API documentation for details on
             # why this is necessary:
@@ -159,5 +167,17 @@ class RemoteForm(object):
             form_dict['data'] = self.form.data
         else:
             form_dict['data'] = initial_data
+
+        for field_name in foreign_key_fields:
+            obj_list = form_dict['data'].get(field_name, [])
+            if obj_list:
+                form_dict['data'][field_name] = [obj.pk for obj in obj_list]
+
+        for field_name in comma_separated_fields:
+            obj = form_dict['data'].get(field_name, '')
+            if obj:
+                form_dict['data'][field_name] = obj.split(',')
+            else:
+                form_dict['data'][field_name] = []
 
         return resolve_promise(form_dict)
