@@ -22,17 +22,22 @@ class RemoteWidget(object):
             widget_dict['related_field'] = self.widget.related_field
 
         if hasattr(self.widget, 'choices'):
-            widget_dict['choices'] = []
-            for key, value, *data in self.widget.choices:
-                complementary_data = {}
-                if len(data) and type(data[0]) is dict:
-                    complementary_data = data[0]
+            widget_dict['choices'] = widget_dict.get('choices', [])
+            if type(self.widget.choices) is list:
+                for key, value, *data in self.widget.choices:
+                    complementary_data = {}
+                    if len(data) and type(data[0]) is dict:
+                        complementary_data = data[0]
 
-                widget_dict['choices'].append(dict(
-                    **complementary_data,
-                    value = key,
-                    display = value
-                ))
+                    widget_dict['choices'].append(dict(
+                        **complementary_data,
+                        value = key,
+                        display = value
+                    ))
+            else:
+                print(f"Choices expect a list but received {type(self.widget.choices)}")
+                widget_dict['choices'] = []
+                self.widget.choices = []
 
         return widget_dict
 
