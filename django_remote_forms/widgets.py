@@ -24,20 +24,25 @@ class RemoteWidget(object):
         if hasattr(self.widget, 'choices'):
             widget_dict['choices'] = widget_dict.get('choices', [])
             if type(self.widget.choices) is list:
-                for key, value, *data in self.widget.choices:
-                    complementary_data = {}
-                    if len(data) and type(data[0]) is dict:
-                        complementary_data = data[0]
-
-                    widget_dict['choices'].append(dict(
-                        **complementary_data,
-                        value = key,
-                        display = value
-                    ))
+                self.widget.choices = self.widget.choices
+            elif type(self.widget.choices) is tuple:
+                self.widget.choices = list(self.widget.choices)
             else:
-                print(f"Choices expect a list but received {type(self.widget.choices)}")
+                print(self.widget.choices)
+                print(f"Unable to parse type {type(self.widget.choices)} for widget choices")
                 widget_dict['choices'] = []
                 self.widget.choices = []
+
+            for key, value, *data in self.widget.choices:
+                complementary_data = {}
+                if len(data) and type(data[0]) is dict:
+                    complementary_data = data[0]
+
+                widget_dict['choices'].append(dict(
+                    **complementary_data,
+                    value = key,
+                    display = value
+                ))            
 
         return widget_dict
 
