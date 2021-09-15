@@ -3,7 +3,7 @@ from collections import OrderedDict
 from django_remote_forms import fields, logger
 from django_remote_forms.utils import resolve_promise
 
-from django.forms import ModelMultipleChoiceField
+from django.forms import ModelMultipleChoiceField, FileField, ImageField
 
 class RemoteForm(object):
     def __init__(self, form, *args, **kwargs):
@@ -123,6 +123,7 @@ class RemoteForm(object):
 
         initial_data = {}
         foreign_key_fields = []
+        file_fields = []
         comma_separated_fields = []
 
         for name, field in [(x, self.form.fields[x]) for x in self.fields]:
@@ -134,6 +135,8 @@ class RemoteForm(object):
                 foreign_key_fields.append(name)
             elif type(field) in [fields.CommaSeparatedField]:
                 comma_separated_fields.append(name)
+            elif type(field) in [FileField, ImageField]:
+                file_fields.append(name)
 
             # Please refer to the Django Form API documentation for details on
             # why this is necessary:
@@ -184,5 +187,12 @@ class RemoteForm(object):
                 form_dict['data'][field_name] = obj.split(',')
             else:
                 form_dict['data'][field_name] = []
+
+        for field_name in file_fields:
+            obj = form_dict['data'].get(field_name, None)
+            if obj:
+                form_dict['data'][field_name] = obj.url
+            else:
+                form_dict['data'][field_name] = None
 
         return resolve_promise(form_dict)
