@@ -278,6 +278,11 @@ class RemoteIPAddressField(RemoteCharField):
         return super(RemoteIPAddressField, self).as_dict()
 
 
+class RemoteGenericIPAddressField(RemoteCharField):
+    def as_dict(self):
+        return super(RemoteGenericIPAddressField, self).as_dict()
+
+
 class RemoteSlugField(RemoteCharField):
     def as_dict(self):
         return super(RemoteSlugField, self).as_dict()
