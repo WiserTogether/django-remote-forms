@@ -179,7 +179,8 @@ class RemoteForm(object):
         for field_name in foreign_key_fields:
             obj_list = form_dict['data'].get(field_name, [])
             if obj_list:
-                form_dict['data'][field_name] = [obj.pk for obj in obj_list]
+                form_dict['data'][field_name] = [getattr(obj, 'pk', obj)
+                                                    for obj in obj_list]
 
         for field_name in comma_separated_fields:
             obj = form_dict['data'].get(field_name, '')
