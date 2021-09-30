@@ -166,8 +166,6 @@ class RemoteForm(object):
 
             initial_data[name] = form_dict['fields'][name]['initial']
 
-        form_data = self.form.data.copy()
-
         # Filter data to include only form fields data
         form_data = {k: v for k, v in self.form.data.items() if k in list(self.fields)}
 
@@ -191,7 +189,7 @@ class RemoteForm(object):
 
         for field_name in file_fields:
             obj = form_dict['data'].get(field_name, None)
-            if obj:
+            if getattr(obj, 'url', None):
                 form_dict['data'][field_name] = obj.url
             else:
                 form_dict['data'][field_name] = None
