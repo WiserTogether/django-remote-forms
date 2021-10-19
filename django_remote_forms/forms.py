@@ -182,8 +182,10 @@ class RemoteForm(object):
 
         for field_name in comma_separated_fields:
             obj = form_dict['data'].get(field_name, '')
-            if obj:
+            if isinstance(obj, str):
                 form_dict['data'][field_name] = obj.split(',')
+            elif isinstance(obj, list):
+                form_dict['data'][field_name] = obj
             else:
                 form_dict['data'][field_name] = []
 
