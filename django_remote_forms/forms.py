@@ -81,7 +81,7 @@ class RemoteForm(object):
             logger.warning('Following fieldset fields are excluded %s' % (fieldset_fields - set(self.fields)))
             self.fieldsets = {}
 
-    def as_dict(self):
+    def as_dict(self, validated=True):
         """
         Returns a form as a dictionary that looks like the following:
 
@@ -110,13 +110,18 @@ class RemoteForm(object):
         """
         form_dict = OrderedDict()
         form_dict['title'] = self.form.__class__.__name__
-        form_dict['non_field_errors'] = self.form.non_field_errors()
         form_dict['label_suffix'] = self.form.label_suffix
         form_dict['is_bound'] = self.form.is_bound
         form_dict['prefix'] = self.form.prefix
         form_dict['fields'] = OrderedDict()
-        form_dict['errors'] = self.form.errors
         form_dict['fieldsets'] = getattr(self.form, 'fieldsets', [])
+
+        if validated:
+            form_dict['non_field_errors'] = self.form.non_field_errors()
+            form_dict['errors'] = self.form.errors
+        else:
+            form_dict['non_field_errors'] = []
+            form_dict['errors'] = {}
 
         # If there are no fieldsets, specify order
         form_dict['ordered_fields'] = self.fields
