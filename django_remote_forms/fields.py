@@ -180,7 +180,7 @@ class RemoteChoiceField(RemoteField):
         field_dict['choices'] = []
         for key, value in self.field.choices:
             field_dict['choices'].append({
-                'value': key,
+                'value': str(key),
                 'display': value
             })
 
