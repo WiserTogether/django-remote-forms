@@ -169,7 +169,7 @@ class RemoteSelect(RemoteWidget):
         widget_dict['choices'] = []
         for key, value in self.widget.choices:
             widget_dict['choices'].append({
-                'value': key,
+                'value': str(key),
                 'display': value
             })
 
@@ -233,7 +233,7 @@ class RemoteRadioSelect(RemoteSelect):
         for key, value in self.widget.choices:
             widget_dict['choices'].append({
                 'name': self.field_name or '',
-                'value': key,
+                'value': str(key),
                 'display': value
             })
 
