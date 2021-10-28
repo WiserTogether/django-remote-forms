@@ -180,7 +180,7 @@ class RemoteChoiceField(RemoteField):
         field_dict['choices'] = []
         for key, value in self.field.choices:
             field_dict['choices'].append({
-                'value': key,
+                'value': str(key),
                 'display': value
             })
 
@@ -276,6 +276,11 @@ class RemoteSplitDateTimeField(RemoteMultiValueField):
 class RemoteIPAddressField(RemoteCharField):
     def as_dict(self):
         return super(RemoteIPAddressField, self).as_dict()
+
+
+class RemoteGenericIPAddressField(RemoteCharField):
+    def as_dict(self):
+        return super(RemoteGenericIPAddressField, self).as_dict()
 
 
 class RemoteSlugField(RemoteCharField):

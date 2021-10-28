@@ -3,7 +3,7 @@ from collections import OrderedDict
 from django_remote_forms import fields, logger
 from django_remote_forms.utils import resolve_promise
 
-from django.forms import ModelMultipleChoiceField
+from django.forms import ModelMultipleChoiceField, FileField, ImageField
 
 class RemoteForm(object):
     def __init__(self, form, *args, **kwargs):
@@ -81,7 +81,7 @@ class RemoteForm(object):
             logger.warning('Following fieldset fields are excluded %s' % (fieldset_fields - set(self.fields)))
             self.fieldsets = {}
 
-    def as_dict(self):
+    def as_dict(self, validated=True):
         """
         Returns a form as a dictionary that looks like the following:
 
@@ -110,19 +110,25 @@ class RemoteForm(object):
         """
         form_dict = OrderedDict()
         form_dict['title'] = self.form.__class__.__name__
-        form_dict['non_field_errors'] = self.form.non_field_errors()
         form_dict['label_suffix'] = self.form.label_suffix
         form_dict['is_bound'] = self.form.is_bound
         form_dict['prefix'] = self.form.prefix
         form_dict['fields'] = OrderedDict()
-        form_dict['errors'] = self.form.errors
         form_dict['fieldsets'] = getattr(self.form, 'fieldsets', [])
+
+        if validated:
+            form_dict['non_field_errors'] = self.form.non_field_errors()
+            form_dict['errors'] = self.form.errors
+        else:
+            form_dict['non_field_errors'] = []
+            form_dict['errors'] = {}
 
         # If there are no fieldsets, specify order
         form_dict['ordered_fields'] = self.fields
 
         initial_data = {}
         foreign_key_fields = []
+        file_fields = []
         comma_separated_fields = []
 
         for name, field in [(x, self.form.fields[x]) for x in self.fields]:
@@ -134,6 +140,8 @@ class RemoteForm(object):
                 foreign_key_fields.append(name)
             elif type(field) in [fields.CommaSeparatedField]:
                 comma_separated_fields.append(name)
+            elif type(field) in [FileField, ImageField]:
+                file_fields.append(name)
 
             # Please refer to the Django Form API documentation for details on
             # why this is necessary:
@@ -163,8 +171,6 @@ class RemoteForm(object):
 
             initial_data[name] = form_dict['fields'][name]['initial']
 
-        form_data = self.form.data.copy()
-
         # Filter data to include only form fields data
         form_data = {k: v for k, v in self.form.data.items() if k in list(self.fields)}
 
@@ -176,13 +182,23 @@ class RemoteForm(object):
         for field_name in foreign_key_fields:
             obj_list = form_dict['data'].get(field_name, [])
             if obj_list:
-                form_dict['data'][field_name] = [obj.pk for obj in obj_list]
+                form_dict['data'][field_name] = [getattr(obj, 'pk', obj)
+                                                    for obj in obj_list]
 
         for field_name in comma_separated_fields:
             obj = form_dict['data'].get(field_name, '')
-            if obj:
+            if obj and isinstance(obj, str):
                 form_dict['data'][field_name] = obj.split(',')
+            elif isinstance(obj, list):
+                form_dict['data'][field_name] = obj
             else:
                 form_dict['data'][field_name] = []
+
+        for field_name in file_fields:
+            obj = form_dict['data'].get(field_name, None)
+            if getattr(obj, 'url', None):
+                form_dict['data'][field_name] = obj.url
+            else:
+                form_dict['data'][field_name] = None
 
         return resolve_promise(form_dict)
