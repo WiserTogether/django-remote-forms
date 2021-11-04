@@ -196,9 +196,12 @@ class RemoteForm(object):
 
         for field_name in file_fields:
             obj = form_dict['data'].get(field_name, None)
-            if getattr(obj, 'url', None):
-                form_dict['data'][field_name] = obj.url
-            else:
+            try:
+                if getattr(obj, 'url', None):
+                    form_dict['data'][field_name] = obj.url
+                else:
+                    form_dict['data'][field_name] = None
+            except ValueError:
                 form_dict['data'][field_name] = None
 
         return resolve_promise(form_dict)
