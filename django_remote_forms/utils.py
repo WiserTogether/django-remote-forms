@@ -1,5 +1,5 @@
 from django.utils.functional import Promise
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 
 def resolve_promise(o):
@@ -10,7 +10,7 @@ def resolve_promise(o):
         o = [resolve_promise(x) for x in o]
     elif isinstance(o, Promise):
         try:
-            o = force_text(o)
+            o = force_str(o)
         except:
             # Item could be a lazy tuple or list
             try:
