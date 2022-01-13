@@ -30,6 +30,15 @@ class RemoteInput(RemoteWidget):
         return widget_dict
 
 
+class DefaultRemoteInput(RemoteWidget):
+    def as_dict(self):
+        widget_dict = super(DefaultRemoteInput, self).as_dict()
+
+        widget_dict['input_type'] = 'text'
+
+        return widget_dict
+
+
 class RemoteTextInput(RemoteInput):
     def as_dict(self):
         return super(RemoteTextInput, self).as_dict()

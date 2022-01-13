@@ -7,6 +7,8 @@ from django.conf import settings
 from django_remote_forms import logger, widgets
 from django import forms
 
+DEFAULT_REMOTE_WIDGET_CLASS_NAME = 'DefaultRemoteInput'
+
 
 class RemoteField(object):
     """
@@ -40,12 +42,12 @@ class RemoteField(object):
         remote_widget_class_name = 'Remote%s' % self.field.widget.__class__.__name__
         try:
             remote_widget_class = getattr(widgets, remote_widget_class_name)
-            remote_widget = remote_widget_class(self.field.widget, field_name=self.field_name)
         except Exception as e:
             logger.warning('Error serializing %s: %s', remote_widget_class_name, str(e))
-            widget_dict = {}
-        else:
-            widget_dict = remote_widget.as_dict()
+            remote_widget_class = getattr(widgets, DEFAULT_REMOTE_WIDGET_CLASS_NAME)
+
+        remote_widget = remote_widget_class(self.field.widget, field_name=self.field_name)
+        widget_dict = remote_widget.as_dict()
 
         field_dict['widget'] = widget_dict
 
