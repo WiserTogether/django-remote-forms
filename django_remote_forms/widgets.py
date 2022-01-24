@@ -68,8 +68,8 @@ class RemoteNumberInput(RemoteInput):
     def as_dict(self):
         widget_dict = super(RemoteNumberInput, self).as_dict()
 
-        widget_dict['title'] = 'TextInput'
-        widget_dict['input_type'] = 'text'
+        widget_dict['title'] = 'IntegerInput'
+        widget_dict['input_type'] = 'integer'
 
         return widget_dict
 
