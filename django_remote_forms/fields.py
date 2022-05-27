@@ -304,7 +304,10 @@ class CommaSeparatedField(forms.MultipleChoiceField):
         super().__init__(*args, **kwargs)
 
     def prepare_value(self, value):
-        return value.split(',') if value else value
+        if type(value) == str:
+            return value.split(',')
+        else:
+            return value
 
     def clean(self, value):
         value = super().clean(value)
