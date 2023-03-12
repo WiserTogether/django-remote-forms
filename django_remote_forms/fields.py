@@ -25,6 +25,7 @@ class RemoteField(object):
         self.field = field
         self.form_initial_data = form_initial_data
 
+    @property
     def initial(self): 
         return self.form_initial_data or self.field.initial
 
@@ -86,6 +87,7 @@ class RemoteIntegerField(RemoteField):
 
 
 class RemoteFloatField(RemoteIntegerField):
+    @property
     def initial(self): 
         if type(self.form_initial_data) == 'float':
             return self.form_initial_data
