@@ -10,6 +10,7 @@ class RemoteForm(object):
 
         self.all_fields = set(self.form.fields.keys())
 
+        self.title = kwargs.pop('title', None)
         self.excluded_fields = set(kwargs.pop('exclude', []))
         self.included_fields = set(kwargs.pop('include', []))
         self.readonly_fields = set(kwargs.pop('readonly', []))
@@ -108,7 +109,8 @@ class RemoteForm(object):
         }
         """
         form_dict = OrderedDict()
-        form_dict['title'] = self.form.__class__.__name__
+        
+        form_dict['title'] = self.title if self.title else self.form.__class__.__name__
         form_dict['non_field_errors'] = self.form.non_field_errors()
         form_dict['label_suffix'] = self.form.label_suffix
         form_dict['is_bound'] = self.form.is_bound
@@ -122,7 +124,7 @@ class RemoteForm(object):
 
         initial_data = {}
 
-        for name, field in [(x, self.form.fields[x]) for x in self.fields]:
+        for name, field in [(x, self.form.fields[x]) for x in self.fields]:            
             # Retrieve the initial data from the form itself if it exists so
             # that we properly handle which initial data should be returned in
             # the dictionary.
@@ -138,7 +140,7 @@ class RemoteForm(object):
             try:
                 remote_field_class = getattr(fields, remote_field_class_name)
                 remote_field = remote_field_class(field, form_initial_field_data, field_name=name)
-            except Exception, e:
+            except Exception as e:
                 logger.warning('Error serializing field %s: %s', remote_field_class_name, str(e))
                 field_dict = {}
             else:
@@ -153,11 +155,14 @@ class RemoteForm(object):
             if 'initial' not in form_dict['fields'][name]:
                 form_dict['fields'][name]['initial'] = None
 
-            initial_data[name] = form_dict['fields'][name]['initial']
+            # Remove the coerce key from the field, it will not be used
+            if form_dict['fields'][name].get('coerce'):
+                form_dict['fields'][name].pop('coerce')
 
+            initial_data[name] = form_dict['fields'][name]['initial']
         if self.form.data:
             form_dict['data'] = self.form.data
         else:
             form_dict['data'] = initial_data
-
+        
         return resolve_promise(form_dict)
