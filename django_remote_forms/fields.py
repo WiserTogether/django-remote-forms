@@ -25,12 +25,15 @@ class RemoteField(object):
         self.field = field
         self.form_initial_data = form_initial_data
 
+    def initial(self): 
+        return self.form_initial_data or self.field.initial
+
     def as_dict(self):
         field_dict = OrderedDict()
         field_dict['title'] = self.field.__class__.__name__
         field_dict['required'] = self.field.required
         field_dict['label'] = _(self.field.label)
-        field_dict['initial'] = self.form_initial_data or self.field.initial
+        field_dict['initial'] = self.initial
         field_dict['help_text'] = self.field.help_text
 
         field_dict['error_messages'] = self.field.error_messages
@@ -83,6 +86,11 @@ class RemoteIntegerField(RemoteField):
 
 
 class RemoteFloatField(RemoteIntegerField):
+    def initial(self): 
+        if type(self.form_initial_data) == 'float':
+            return self.form_initial_data
+        return self.field.initial
+
     def as_dict(self):
         return super(RemoteFloatField, self).as_dict()
 
